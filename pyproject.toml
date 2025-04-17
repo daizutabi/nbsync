@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nbsync"
+version = "0.1.0"
+description = "A MkDocs plugin for seamlessly embedding Jupyter notebook visualizations into documentation with simple Markdown syntax"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "daizutabi", email = "daizutabi@gmail.com" }]
+keywords = ["jupyter", "notebook", "mkdocs"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Documentation",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Text Processing :: Markup :: Markdown",
+]
+requires-python = ">=3.10"
+dependencies = ["mkdocs>=1.6", "nbstore>=0.4.1"]
+
+[project.urls]
+Documentation = "https://daizutabi.github.io/nbsync/"
+Source = "https://github.com/daizutabi/nbsync"
+Issues = "https://github.com/daizutabi/nbsync/issues"
+
+[project.entry-points."mkdocs.plugins"]
+nbsync = "nbsync.plugin:Plugin"
+
+[dependency-groups]
+dev = [
+  "ipykernel>=6.29.5",
+  "matplotlib>=3.10.1",
+  "mkdocs-material>=9.6.11",
+  "nbconvert>=7.16.6",
+  "pandas>=2.2",
+  "polars>=1.26",
+  "pytest-clarity>=1.0.1",
+  "pytest-cov>=6.1.0",
+  "pytest-randomly>=3.16.0",
+  "pytest-xdist>=3.6.1",
+  "ruff>=0.11.4",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["src", "tests"]
+addopts = ["--doctest-modules", "--cov=nbsync", "--cov-report=lcov:lcov.info"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "except ImportError",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+]
+skip_covered = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["ALL"]
+unfixable = ["F401"]
+ignore = ["ANN401", "ARG001", "ARG002", "C901", "D", "S105"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = ["ANN", "ARG", "D", "FBT", "PLR", "RUF", "S", "PGH003"]
+"**/notebooks/*" = ["ANN", "ERA001", "NPY", "T201"]
+
+[tool.pyright]
+include = ["src", "tests"]
+strictDictionaryInference = true
+strictListInference = true
+strictSetInference = true

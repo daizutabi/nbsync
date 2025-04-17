@@ -1,0 +1,3 @@
+**/notebooks/* linguist-vendored
+.devcontainer/* linguist-vendored
+*.ipynb linguist-vendored
