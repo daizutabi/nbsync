@@ -7,19 +7,13 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Self
 
-    from .markdown import Element
+    from nbstore.markdown import Image
 
 
 @dataclass
 class Figure:
-    elem: Element
-    """The element."""
-
-    alt: str
-    """The alternative text."""
-
-    url: str
-    """The Notebook URL."""
+    image: Image
+    """The image instance from the Markdown file."""
 
     mime: str = ""
     """The MIME type of the image."""
@@ -29,12 +23,6 @@ class Figure:
 
     src: str = ""
     """The source URI of the image in MkDocs."""
-
-    @classmethod
-    def from_element(cls, elem: Element) -> Self:
-        alt = getattr(elem, "alt", "")
-        url = getattr(elem, "url", "")
-        return cls(elem, alt, url)
 
     def convert(self, mime: str, content: bytes | str) -> Self | str:
         if mime.startswith("text/") and isinstance(content, str):
@@ -47,9 +35,9 @@ class Figure:
 
     @property
     def markdown(self) -> str:
-        src = self.src or self.url
-        attr = " ".join(self.elem.iter_parts(include_identifier=True))
-        return f"![{self.alt}]({src}){{{attr}}}"
+        src = self.src or self.image.url
+        attr = " ".join(self.image.iter_parts(include_identifier=True))
+        return f"![{self.image.alt}]({src}){{{attr}}}"
 
 
 def get_suffix(mime: str) -> str:

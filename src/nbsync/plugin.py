@@ -9,8 +9,8 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import File
 from nbstore.store import Store
 
-from .converter import convert
 from .logger import logger
+from .sync import Synchronizer
 
 if TYPE_CHECKING:
     from typing import Any
@@ -30,6 +30,7 @@ class Config(BaseConfig):
 
 class Plugin(BasePlugin[Config]):
     store: ClassVar[Store | None] = None
+    syncs: ClassVar[dict[str, Synchronizer]] = {}
     files: Files
 
     def on_config(self, config: MkDocsConfig, **kwargs: Any) -> MkDocsConfig:
@@ -68,24 +69,34 @@ class Plugin(BasePlugin[Config]):
             logger.error(msg)
             raise RuntimeError(msg)
 
-        markdowns = []
-        for fig in convert(markdown, self.__class__.store):
-            if isinstance(fig, str):
-                markdowns.append(fig)
+        src_uri = page.file.src_uri
+        syncs = self.__class__.syncs
 
-            elif fig.content:
-                for file in generate_files(fig, page.file.src_uri, config):
+        if src_uri not in syncs:
+            syncs[src_uri] = Synchronizer(self.__class__.store)
+
+        sync = syncs[src_uri]
+        elems = list(sync.parse(markdown))
+        sync.execute()
+
+        markdowns = []
+        for elem in sync.convert(elems):
+            if isinstance(elem, str):
+                markdowns.append(elem)
+
+            elif elem.content:
+                for file in generate_files(elem, src_uri, config):
                     self.files.append(file)
-                markdowns.append(fig.markdown)
+                markdowns.append(elem.markdown)
 
         return "".join(markdowns)
 
 
-def generate_files(image: Figure, page_uri: str, config: MkDocsConfig) -> list[File]:
-    src_uri = (Path(page_uri).parent / image.src).as_posix()
+def generate_files(fig: Figure, page_uri: str, config: MkDocsConfig) -> list[File]:
+    src_uri = (Path(page_uri).parent / fig.src).as_posix()
 
-    info = f"{image.url}#{image.elem.identifier} ({image.mime}) -> {src_uri}"
+    info = f"{fig.image.url}#{fig.image.identifier} ({fig.mime}) -> {src_uri}"
     logger.debug(f"Creating image: {info}")
 
-    file = File.generated(config, src_uri, content=image.content)
+    file = File.generated(config, src_uri, content=fig.content)
     return [file]

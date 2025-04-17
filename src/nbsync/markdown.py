@@ -14,6 +14,7 @@ Element: TypeAlias = str | CodeBlock | Image
 
 def parse(text: str) -> Iterator[Element]:
     elems = nbstore.markdown.parse(text)
+
     for elem in parse_url(elems):
         if isinstance(elem, Image):
             yield from parse_image(elem)
@@ -36,7 +37,7 @@ def parse_url(elems: Iterable[Element]) -> Iterator[Element]:
             yield elem
 
 
-SUPPORTED_EXTENSIONS = (".md", ".py", ".ipynb")
+SUPPORTED_EXTENSIONS = (".ipynb", ".md", ".py")
 
 
 def set_url(elem: Image | CodeBlock, url: str) -> tuple[Element, str]:
@@ -51,12 +52,9 @@ def set_url(elem: Image | CodeBlock, url: str) -> tuple[Element, str]:
 
 
 def parse_image(image: Image) -> Iterator[str | Image | CodeBlock]:
-    if image.identifier == "_":
-        return
-
-    if image.code:
+    if image.source:
         image.identifier = image.identifier or str(uuid.uuid4())
-        yield CodeBlock("", image.identifier, [], {}, image.code, image.url)
+        yield CodeBlock("", image.identifier, [], {}, image.source, image.url)
         yield image
 
     elif image.identifier:
