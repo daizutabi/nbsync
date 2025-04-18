@@ -75,28 +75,24 @@ class Plugin(BasePlugin[Config]):
         if src_uri not in syncs:
             syncs[src_uri] = Synchronizer(self.__class__.store)
 
-        sync = syncs[src_uri]
-        elems = list(sync.parse(markdown))
-        sync.execute()
-
         markdowns = []
-        for elem in sync.convert(elems):
+
+        for elem in syncs[src_uri].convert(markdown):
             if isinstance(elem, str):
                 markdowns.append(elem)
 
             elif elem.content:
-                for file in generate_files(elem, src_uri, config):
-                    self.files.append(file)
                 markdowns.append(elem.markdown)
+                file = generate_file(elem, src_uri, config)
+                self.files.append(file)
 
         return "".join(markdowns)
 
 
-def generate_files(fig: Figure, page_uri: str, config: MkDocsConfig) -> list[File]:
+def generate_file(fig: Figure, page_uri: str, config: MkDocsConfig) -> File:
     src_uri = (Path(page_uri).parent / fig.src).as_posix()
 
     info = f"{fig.image.url}#{fig.image.identifier} ({fig.mime}) -> {src_uri}"
     logger.debug(f"Creating image: {info}")
 
-    file = File.generated(config, src_uri, content=fig.content)
-    return [file]
+    return File.generated(config, src_uri, content=fig.content)

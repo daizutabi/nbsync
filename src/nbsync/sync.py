@@ -47,7 +47,10 @@ class Synchronizer:
             logger.info(f"Executing notebook: {path}")
             notebook.execute()
 
-    def convert(self, elems: Iterable[str | Image]) -> Iterator[str | Figure]:
+    def convert(self, text: str) -> Iterator[str | Figure]:
+        elems = list(self.parse(text))
+        self.execute()
+
         for elem in elems:
             if isinstance(elem, str):
                 yield elem
