@@ -76,7 +76,11 @@ def update_notebooks(
         if url == ".md":
             notebooks[url] = Notebook(nbformat.v4.new_notebook())
         else:
-            notebooks[url] = Notebook(store.read(url))
+            try:
+                notebooks[url] = Notebook(store.read(url))
+            except Exception:  # noqa: BLE001
+                logger.warning(f"Error reading notebook: {url}")
+                return
 
     notebook = notebooks[url]
 

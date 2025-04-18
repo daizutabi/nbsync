@@ -35,7 +35,6 @@ theme:
     - navigation.indexes
     - navigation.sections
     - navigation.tabs
-    - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
@@ -85,7 +84,3 @@ nav:
       - examples/basic.md
       - examples/tables.md
       - examples/advanced.md
-  - Reference:
-      - reference/syntax.md
-      - reference/configuration.md
-      - reference/api.md
