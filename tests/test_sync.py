@@ -104,30 +104,30 @@ def store(tmp_path_factory: pytest.TempPathFactory) -> Store:
     return Store(src_dir)
 
 
-def test_update_notebooks(store):
-    from nbsync.sync import update_notebooks
+def test_update_notebooks(store: Store):
+    from nbsync.sync import Notebook, update_notebooks
 
-    notebooks = {}
+    notebooks: dict[str, Notebook] = {}
     update_notebooks(notebooks, Image("abc", "id", [], {}, "", "a.ipynb"), store)
     assert len(notebooks) == 1
     nb = notebooks["a.ipynb"].nb
     assert nbstore.notebook.get_source(nb, "id") == "print(1+1)"
 
 
-def test_update_notebooks_exec(store):
-    from nbsync.sync import update_notebooks
+def test_update_notebooks_exec(store: Store):
+    from nbsync.sync import Notebook, update_notebooks
 
-    notebooks = {}
+    notebooks: dict[str, Notebook] = {}
     image = Image("abc", "id", [], {"exec": "1"}, "", "a.ipynb")
     update_notebooks(notebooks, image, store)
     assert len(notebooks) == 1
     assert notebooks["a.ipynb"].execution_needed
 
 
-def test_update_notebooks_add_cell(store):
-    from nbsync.sync import update_notebooks
+def test_update_notebooks_add_cell(store: Store):
+    from nbsync.sync import Notebook, update_notebooks
 
-    notebooks = {}
+    notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "a.ipynb")
     update_notebooks(notebooks, code_block, store)
     assert len(notebooks) == 1
@@ -135,3 +135,14 @@ def test_update_notebooks_add_cell(store):
     assert notebook.execution_needed
     assert len(notebook.nb.cells) == 2
     assert len(store.read("a.ipynb").cells) == 1
+
+
+def test_update_notebooks_self(store: Store):
+    from nbsync.sync import Notebook, update_notebooks
+
+    notebooks: dict[str, Notebook] = {}
+    code_block = CodeBlock("abc", "id2", [], {}, "123", ".md")
+    update_notebooks(notebooks, code_block, store)
+    assert len(notebooks) == 1
+    notebook = notebooks[".md"]
+    assert len(notebook.nb.cells) == 1

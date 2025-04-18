@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+import nbformat
 import nbstore.notebook
 from nbstore.markdown import CodeBlock, Image
 
@@ -54,6 +55,7 @@ class Synchronizer:
         for elem in elems:
             if isinstance(elem, str):
                 yield elem
+
             elif elem.identifier != "_":
                 nb = self.notebooks[elem.url].nb
                 yield from convert_image(elem, nb)
@@ -67,7 +69,10 @@ def update_notebooks(
     url = elem.url
 
     if url not in notebooks:
-        notebooks[url] = Notebook(store.read(url))
+        if url == ".md":
+            notebooks[url] = Notebook(nbformat.v4.new_notebook())
+        else:
+            notebooks[url] = Notebook(store.read(url))
 
     notebook = notebooks[url]
 
@@ -91,7 +96,7 @@ def convert_image(image: Image, nb: NotebookNode) -> Iterator[str | Figure]:
         return
 
     if mime_content := nbstore.notebook.get_mime_content(nb, image.identifier):
-        yield Figure(image, *mime_content)
+        yield Figure(image, *mime_content).convert()
 
     elif not has_source:
         yield get_source(image, nb)
