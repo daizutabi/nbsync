@@ -13,7 +13,7 @@ from nbsync.notebook import Notebook
 from .logger import logger
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterator
 
     from nbformat import NotebookNode
     from nbstore import Store
@@ -79,7 +79,7 @@ def update_notebooks(
 
 
 def is_truelike(value: str | None) -> bool:
-    return value is not None and value.lower() in ("yes", "true", "1")
+    return value is not None and value.lower() in ("yes", "true", "1", "on")
 
 
 def convert_image(image: Image, nb: NotebookNode) -> Iterator[str | Figure]:
@@ -91,7 +91,7 @@ def convert_image(image: Image, nb: NotebookNode) -> Iterator[str | Figure]:
         return
 
     if mime_content := nbstore.notebook.get_mime_content(nb, image.identifier):
-        yield Figure(image).convert(*mime_content)
+        yield Figure(image, *mime_content)
 
     elif not has_source:
         yield get_source(image, nb)

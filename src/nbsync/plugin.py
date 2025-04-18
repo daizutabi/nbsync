@@ -77,7 +77,9 @@ class Plugin(BasePlugin[Config]):
 
         markdowns = []
 
-        for elem in syncs[src_uri].convert(markdown):
+        for elem_ in syncs[src_uri].convert(markdown):
+            elem = elem_.convert() if isinstance(elem_, Figure) else elem_
+
             if isinstance(elem, str):
                 markdowns.append(elem)
 
