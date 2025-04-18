@@ -12,6 +12,7 @@ theme:
     code: Fira Code
   icon:
     repo: fontawesome/brands/github
+    logo: material/notebook-edit-outline
   palette:
     - scheme: default
       primary: indigo
@@ -20,8 +21,8 @@ theme:
         icon: material/weather-sunny
         name: Switch to dark mode
     - scheme: slate
-      primary: black
-      accent: black
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/weather-night
         name: Switch to light mode
@@ -34,16 +35,22 @@ theme:
     - navigation.indexes
     - navigation.sections
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
     - search.suggest
+    - toc.follow
 plugins:
   - search
   - nbsync:
-      src_dir: ../notebooks
+      src_dir:
+        - ../notebooks
+        - ../scripts
+  - markdown-exec
 markdown_extensions:
   - admonition
+  - attr_list
   - md_in_html
   - pymdownx.highlight:
       use_pygments: true
@@ -53,12 +60,32 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - tables
+  - toc:
+      permalink: true
 nav:
   - Home: index.md
+  - Features:
+      - features/overview.md
+      - features/markdown.md
+      - features/python.md
+      - features/images.md
+      - features/dynamic.md
+  - Getting Started:
+      - getting-started/installation.md
+      - getting-started/configuration.md
+      - getting-started/first-steps.md
   - Usage:
       - usage/notebook.md
-      - usage/class.md
-      - usage/execute.md
-  # - Examples:
-  #     - examples/format.md
-  #     - examples/html.md
+      - usage/python-files.md
+      - usage/markdown-files.md
+      - usage/execution.md
+      - usage/tabbed-display.md
+  - Examples:
+      - examples/basic.md
+      - examples/tables.md
+      - examples/advanced.md
+  - Reference:
+      - reference/syntax.md
+      - reference/configuration.md
+      - reference/api.md

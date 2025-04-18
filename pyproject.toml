@@ -35,6 +35,7 @@ nbsync = "nbsync.plugin:Plugin"
 [dependency-groups]
 dev = [
   "ipykernel>=6.29.5",
+  "markdown-exec>=1.10",
   "matplotlib>=3.10.1",
   "mkdocs-material>=9.6.11",
   "nbconvert>=7.16.6",
@@ -70,7 +71,7 @@ ignore = ["ANN401", "ARG001", "ARG002", "C901", "D", "S105"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = ["ANN", "ARG", "D", "FBT", "PLR", "RUF", "S", "PGH003"]
-"**/notebooks/*" = ["ANN", "ERA001", "NPY", "T201"]
+"**/{notebooks,scripts}/*" = ["ANN", "ERA001", "NPY", "T201"]
 
 [tool.pyright]
 include = ["src", "tests"]
