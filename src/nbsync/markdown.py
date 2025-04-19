@@ -28,15 +28,19 @@ def convert_image(image: Image) -> Iterator[Element]:
 
 def convert_code_block(code_block: CodeBlock) -> Iterator[Element]:
     source = code_block.attributes.get("source", None)
-    if source != "tabbed-nbsync":
+    if source == "tabbed-nbsync":
+        yield from _convert_code_block_tabbed(code_block)
+    else:
         yield code_block
-        return
 
+
+def _convert_code_block_tabbed(code_block: CodeBlock) -> Iterator[Element]:
     markdown = code_block.text.replace('source="tabbed-nbsync"', "")
     markdown = textwrap.indent(markdown, "    ")
-    yield f'=== "Markdown"\n\n{markdown}\n\n=== "HTML"\n\n'
+    yield f'=== "Markdown"\n\n{markdown}\n\n'
 
     text = textwrap.indent(code_block.source, "    ")
+    text = f'=== "HTML"\n\n{text}'
     yield from nbstore.markdown.parse(text)
 
 

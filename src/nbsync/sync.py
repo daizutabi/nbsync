@@ -123,23 +123,16 @@ def get_source_from_image(image: Image, nb: NotebookNode) -> str:
     if not source:
         return ""
 
-    language = "." + nbstore.notebook.get_language(nb)
+    language = nbstore.notebook.get_language(nb)
     attr = " ".join([language, *image.iter_parts()])
-    return f"```{{{attr}}}\n{source}\n```\n\n"
+    return f"```{attr}\n{source}\n```"
 
 
-def convert_code_block(code_block: CodeBlock) -> Iterator[str]:
+def convert_code_block(code_block: CodeBlock) -> str:
     source = code_block.attributes.pop("source", None)
     if is_truelike(source):
-        yield get_source_from_code_block(code_block)
+        attr = " ".join(code_block.iter_parts())
+        text = f"```{attr}\n{code_block.source}\n```"
+        return textwrap.indent(text, code_block.indent)
 
-
-def get_source_from_code_block(code_block: CodeBlock) -> str:
-    lines = code_block.text.splitlines()
-    if lines:
-        pattern = f"\\S+#{code_block.identifier}"
-        lines[0] = re.sub(pattern, "", lines[0])
-        pattern = r"source=[^\s}]+"
-        lines[0] = re.sub(pattern, "", lines[0])
-
-    return "\n".join(lines) + "\n\n"
+    return ""

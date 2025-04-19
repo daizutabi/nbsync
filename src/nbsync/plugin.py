@@ -86,6 +86,7 @@ class Plugin(BasePlugin[Config]):
                 file = generate_file(elem, src_uri, config)
                 self.files.append(file)
 
+        print("".join(markdowns))
         return "".join(markdowns)
 
 

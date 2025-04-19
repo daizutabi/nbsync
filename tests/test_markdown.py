@@ -66,17 +66,50 @@ def test_convert_image_source_without_identifier():
     assert code_block.identifier == image.identifier
 
 
-def test_convert_code_block():
+SOURCE_TAB_CODE_BLOCK = """\
+````markdown source="tabbed-nbsync"
+```python exec="on"
+print("Hello Markdown from markdown-exec!")
+```
+````
+"""
+
+
+def test_convert_tabbed_code_block_code_block():
     from nbsync.markdown import convert_code_block
 
-    elems = nbstore.markdown.parse(SOURCE_TAB)
+    elems = nbstore.markdown.parse(SOURCE_TAB_CODE_BLOCK)
     code_block = list(elems)[0]
     assert isinstance(code_block, CodeBlock)
     elems = list(convert_code_block(code_block))
     assert isinstance(elems[0], str)
     assert elems[0].startswith("===")
-    assert isinstance(elems[1], CodeBlock)
-    assert elems[1].classes == ["python"]
+    assert "tabbed-nbsync" not in elems[0]
+    assert elems[1] == '=== "HTML"\n\n'
+    assert isinstance(elems[2], CodeBlock)
+    assert elems[2].classes == ["python"]
+    assert elems[2].source.startswith("print(")
+    assert elems[2].text.startswith("    ```python")
+
+
+SOURCE_TAB_IMAGE = """\
+````markdown source="tabbed-nbsync"
+![alt](a.py){#.}
+````
+"""
+
+
+def test_convert_tabbed_code_block_image():
+    from nbsync.markdown import convert_code_block
+
+    elems = nbstore.markdown.parse(SOURCE_TAB_IMAGE)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    elems = list(convert_code_block(code_block))
+    assert elems[1] == '=== "HTML"\n\n'
+    assert isinstance(elems[2], Image)
+    assert elems[2].indent == "    "
+    assert elems[2].text.startswith("    ![")
 
 
 def test_set_url():
@@ -108,7 +141,7 @@ def test_set_url_empty_url(url: str):
     assert url == "a.ipynb"
 
 
-def test_parse_url():
+def test_resolve_urls():
     from nbsync.markdown import resolve_urls
 
     images = [
@@ -122,7 +155,7 @@ def test_parse_url():
         assert image.url == "a.py"
 
 
-def test_parse_url_code_block():
+def test_resolve_urls_code_block():
     from nbsync.markdown import resolve_urls
 
     code_blocks = [CodeBlock("abc", "a", [], {}, "", "")]
@@ -130,7 +163,7 @@ def test_parse_url_code_block():
     assert text == "abc"
 
 
-def test_parse_url_str():
+def test_resolve_urls_str():
     from nbsync.markdown import resolve_urls
 
     text = list(resolve_urls(["abc"]))[0]
@@ -203,12 +236,3 @@ def test_elems_9(elems):
 
 def test_elems_10(elems):
     assert elems[10] == "\n"
-
-
-SOURCE_TAB = """\
-````markdown source="tabbed-nbsync"
-```python exec="on"
-print("Hello Markdown from markdown-exec!")
-```
-````
-"""
