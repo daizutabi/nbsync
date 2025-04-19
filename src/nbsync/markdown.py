@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import textwrap
-import uuid
 from typing import TYPE_CHECKING, TypeAlias
 
 import nbstore.markdown
@@ -13,9 +12,9 @@ if TYPE_CHECKING:
 Element: TypeAlias = str | CodeBlock | Image
 
 
-def convert_image(image: Image) -> Iterator[Element]:
+def convert_image(image: Image, index: int) -> Iterator[Element]:
     if image.source:
-        image.identifier = image.identifier or str(uuid.uuid4())
+        image.identifier = image.identifier or f"image-nbsync-{index}"
         yield CodeBlock("", image.identifier, [], {}, image.source, image.url)
         yield image
 
@@ -91,9 +90,9 @@ def convert_code_blocks(elems: Iterable[Element]) -> Iterator[Element]:
 
 
 def convert_images(elems: Iterable[Element]) -> Iterator[Element]:
-    for elem in elems:
+    for index, elem in enumerate(elems):
         if isinstance(elem, Image):
-            yield from convert_image(elem)
+            yield from convert_image(elem, index)
         else:
             yield elem
 

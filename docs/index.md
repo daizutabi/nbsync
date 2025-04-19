@@ -48,7 +48,7 @@ display.
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(2, 1))
-ax.plot([1, 3, 2, 4])
+ax.plot([1, 3, 3, 4])
 ```
 
 ![Plot result](){#plot source="on"}
