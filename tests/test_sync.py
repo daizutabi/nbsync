@@ -40,17 +40,17 @@ def nb():
 
 
 def test_get_source(nb):
-    from nbsync.sync import get_source
+    from nbsync.sync import get_source_from_image
 
     image = Image("abc", "id", [], {}, "", "a.py")
-    assert get_source(image, nb) == "```{.python}\nprint(1+1)\n```\n\n"
+    assert get_source_from_image(image, nb) == "```{.python}\nprint(1+1)\n```\n\n"
 
 
 def test_get_source_none(nb):
-    from nbsync.sync import get_source
+    from nbsync.sync import get_source_from_image
 
     image = Image("abc", "empty", [], {}, "", "a.py")
-    assert get_source(image, nb) == ""
+    assert get_source_from_image(image, nb) == ""
 
 
 def test_convert_image(nb):

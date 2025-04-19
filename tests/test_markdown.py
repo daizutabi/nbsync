@@ -1,3 +1,4 @@
+import nbstore.markdown
 import pytest
 from nbstore.markdown import CodeBlock, Image, parse
 
@@ -124,7 +125,7 @@ def test_parse_url_str():
 
 
 SOURCE = """\
-![alt](a.py){#_}
+![alt](a.py){#.}
 ![alt](){#id}
 ```python
 a
@@ -150,7 +151,7 @@ def test_len(elems):
 def test_elems_0(elems):
     image = elems[0]
     assert isinstance(image, Image)
-    assert image.identifier == "_"
+    assert image.identifier == "."
     assert image.url == "a.py"
 
 
@@ -189,3 +190,25 @@ def test_elems_9(elems):
 
 def test_elems_10(elems):
     assert elems[10] == "\n"
+
+
+SOURCE_TAB = """\
+````markdown source="tabbed-nbsync"
+```python exec="on"
+print("Hello Markdown from markdown-exec!")
+```
+````
+"""
+
+
+def test_parse_code_block():
+    from nbsync.markdown import parse_code_block
+
+    elems = nbstore.markdown.parse(SOURCE_TAB)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    elems = list(parse_code_block(code_block))
+    assert isinstance(elems[0], str)
+    assert elems[0].startswith("===")
+    assert isinstance(elems[1], CodeBlock)
+    assert elems[1].classes == ["python"]

@@ -111,13 +111,13 @@ the most recently specified notebook.
 ```markdown
 ![First Chart](visualization.ipynb){#figure-1}
 
-![Second Chart](){#figure-2}  <!-- Uses visualization.ipynb -->
+![Second Chart](){#figure-2} <!-- Uses visualization.ipynb -->
 
 Some text between figures...
 
 ![Third Chart](analysis.ipynb){#figure-3}
 
-![Fourth Chart](){#figure-4}  <!-- Uses analysis.ipynb -->
+![Fourth Chart](){#figure-4} <!-- Uses analysis.ipynb -->
 ```
 
 ### How It Works
@@ -143,12 +143,13 @@ figures from the same notebook in sequence.
 ### Declaring Active Notebooks
 
 You can explicitly declare which notebook to use throughout a document
-by using the special identifier `#_`:
+by using the special identifier `#.`:
 
 ```markdown
-![](analysis.ipynb){#_}
+![](analysis.ipynb){#.}
 
 <!-- Now all empty references will use analysis.ipynb -->
+
 ![First chart](){#chart1}
 ![Second chart](){#chart2}
 ```

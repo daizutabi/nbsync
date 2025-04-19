@@ -9,7 +9,6 @@ from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import File
 from nbstore.store import Store
 
-from .figure import Figure
 from .logger import logger
 from .sync import Synchronizer
 
@@ -19,6 +18,8 @@ if TYPE_CHECKING:
     from mkdocs.config.defaults import MkDocsConfig
     from mkdocs.structure.files import Files
     from mkdocs.structure.pages import Page
+
+    from .figure import Figure
 
 
 class Config(BaseConfig):
@@ -85,6 +86,7 @@ class Plugin(BasePlugin[Config]):
                 file = generate_file(elem, src_uri, config)
                 self.files.append(file)
 
+        print("".join(markdowns))
         return "".join(markdowns)
 
 

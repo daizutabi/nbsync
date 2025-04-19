@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+import textwrap
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -25,12 +27,11 @@ class Synchronizer:
     store: Store
     notebooks: dict[str, Notebook] = field(default_factory=dict, init=False)
 
-    def parse(self, text: str) -> Iterator[str | Image]:
+    def parse(self, text: str) -> Iterator[str | Image | CodeBlock]:
         notebooks: dict[str, Notebook] = {}
 
         for elem in nbsync.markdown.parse(text):
-            if isinstance(elem, str | Image):
-                yield elem
+            yield elem
 
             if isinstance(elem, Image | CodeBlock):
                 update_notebooks(notebooks, elem, self.store)
@@ -44,7 +45,7 @@ class Synchronizer:
             if not notebook.execution_needed:
                 continue
 
-            path = self.store.find_path(url)
+            path = ".md" if url == ".md" else self.store.find_path(url)
             logger.info(f"Executing notebook: {path}")
             notebook.execute()
 
@@ -56,9 +57,12 @@ class Synchronizer:
             if isinstance(elem, str):
                 yield elem
 
-            elif elem.identifier != "_":
-                nb = self.notebooks[elem.url].nb
-                yield from convert_image(elem, nb)
+            elif elem.identifier not in [".", "_"]:
+                if isinstance(elem, Image):
+                    nb = self.notebooks[elem.url].nb
+                    yield from convert_image(elem, nb)
+                else:
+                    yield from convert_code_block(elem)
 
 
 def update_notebooks(
@@ -72,7 +76,11 @@ def update_notebooks(
         if url == ".md":
             notebooks[url] = Notebook(nbformat.v4.new_notebook())
         else:
-            notebooks[url] = Notebook(store.read(url))
+            try:
+                notebooks[url] = Notebook(store.read(url))
+            except Exception:  # noqa: BLE001
+                logger.warning(f"Error reading notebook: {url}")
+                return
 
     notebook = notebooks[url]
 
@@ -80,7 +88,8 @@ def update_notebooks(
         notebook.set_execution_needed()
 
     if isinstance(elem, CodeBlock):
-        notebook.add_cell(elem.identifier, elem.source)
+        source = textwrap.dedent(elem.source)
+        notebook.add_cell(elem.identifier, source)
 
 
 def is_truelike(value: str | None) -> bool:
@@ -90,19 +99,26 @@ def is_truelike(value: str | None) -> bool:
 def convert_image(image: Image, nb: NotebookNode) -> Iterator[str | Figure]:
     source = image.attributes.pop("source", None)
     if has_source := (is_truelike(source) or source == "only"):
-        yield get_source(image, nb)
+        yield get_source_from_image(image, nb)
 
     if source == "only":
         return
 
-    if mime_content := nbstore.notebook.get_mime_content(nb, image.identifier):
+    try:
+        mime_content = nbstore.notebook.get_mime_content(nb, image.identifier)
+    except ValueError:
+        cell = f"{image.url}#{image.identifier}"
+        logger.warning(f"Error reading cell: {cell!r}")
+        return
+
+    if mime_content:
         yield Figure(image, *mime_content).convert()
 
     elif not has_source:
-        yield get_source(image, nb)
+        yield get_source_from_image(image, nb)
 
 
-def get_source(image: Image, nb: NotebookNode) -> str:
+def get_source_from_image(image: Image, nb: NotebookNode) -> str:
     source = nbstore.notebook.get_source(nb, image.identifier)
     if not source:
         return ""
@@ -110,3 +126,20 @@ def get_source(image: Image, nb: NotebookNode) -> str:
     language = "." + nbstore.notebook.get_language(nb)
     attr = " ".join([language, *image.iter_parts()])
     return f"```{{{attr}}}\n{source}\n```\n\n"
+
+
+def convert_code_block(code_block: CodeBlock) -> Iterator[str]:
+    source = code_block.attributes.pop("source", None)
+    if is_truelike(source):
+        yield get_source_from_code_block(code_block)
+
+
+def get_source_from_code_block(code_block: CodeBlock) -> str:
+    lines = code_block.text.splitlines()
+    if lines:
+        pattern = f"\\S+#{code_block.identifier}"
+        lines[0] = re.sub(pattern, "", lines[0])
+        pattern = r"source=[^\s}]+"
+        lines[0] = re.sub(pattern, "", lines[0])
+
+    return "\n".join(lines) + "\n\n"

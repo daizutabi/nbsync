@@ -1,122 +1,101 @@
 # nbsync
 
-<strong>Connect Jupyter notebooks to your MkDocs documentation</strong>
+<div class="grid cards" markdown>
 
-nbsync is a plugin that seamlessly embeds Jupyter notebook
-visualizations in your documentation, solving the disconnect between
-code development and documentation.
+- :material-notebook-edit: **Notebooks from Markdown**
+  Extend standard markdown syntax to automatically generate notebooks from
+  documentation
+  [:octicons-arrow-right-24: Markdown Features](#notebooks-from-markdown)
 
-## Why Use nbsync?
+- :material-language-python: **Python File Integration**
+  Directly reference external Python files and reuse functions or classes
+  [:octicons-arrow-right-24: Python Integration](#python-file-integration)
 
-### The Documentation Challenge
+- :material-image-edit: **Code Execution in Images**
+  Execute code within image notation for dynamic visualizations
+  [:octicons-arrow-right-24: Dynamic Visualization](#code-execution-in-images)
 
-Data scientists, researchers, and technical writers face a common dilemma:
+- :material-refresh-auto: **Dynamic Updates**
+  Real-time synchronization between notebooks and documentation
+  [:octicons-arrow-right-24: Dynamic Updates](#dynamic-updates-and-execution)
+
+</div>
+
+## What is nbsync?
+
+nbsync is an innovative plugin that seamlessly connects Jupyter notebooks with
+MkDocs documentation. Going beyond traditional notebook integration, it provides
+functionality to generate and execute notebooks directly from markdown (.md)
+files and Python (.py) files.
+
+It solves common challenges faced by data scientists, researchers, and technical
+writers:
 
 - **Development happens in notebooks** - ideal for experimentation and visualization
 - **Documentation lives in markdown** - perfect for narrative and explanation
-- **Connecting the two is painful** - screenshots break, exports get outdated
+- **Traditional integration is challenging** - screenshots break, exports get outdated
 
-### Our Solution
+## Key Features
 
-This plugin creates a live bridge between your notebooks and documentation by:
+### Notebooks from Markdown
 
-- **Keeping environments separate** - work in the tool best suited for each task
-- **Maintaining connections** - reference specific figures from notebooks
-- **Automating updates** - changes to notebooks reflect in documentation
+Extend standard markdown syntax to define notebook cells within your
+documentation. Present code and its output results concisely with tabbed
+display.
 
-## Key Benefits
-
-- **True Separation of Concerns**:
-  Develop visualizations in Jupyter notebooks and write documentation
-  in markdown files, with each tool optimized for its purpose.
-
-- **Intuitive Markdown Syntax**:
-  Use standard image syntax with a simple extension to reference
-  notebook figures: `![alt text](notebook.ipynb){#figure-id}`
-
-- **Dynamic Notebook Execution**:
-  Execute notebooks on-demand during documentation builds with the
-  `.execute` option, ensuring results are always up-to-date.
-
-- **Automatic Updates**:
-  When you modify your notebooks, your documentation updates
-  automatically in MkDocs serve mode.
-
-- **Clean Source Documents**:
-  Your markdown remains readable and focused on content, without
-  code distractions or complex embedding techniques.
-
-- **Enhanced Development Experience**:
-  Take advantage of IDE features like code completion and syntax
-  highlighting in the appropriate environment.
-
-## Quick Start
-
-### 1. Installation
-
-```bash
-pip install nbsync
-```
-
-### 2. Configuration
-
-Add to your `mkdocs.yml`:
-
-```yaml title="mkdocs.yml"
-plugins:
-  - nbsync:
-      src_dir: ../notebooks
-```
-
-### 3. Mark Figures in Your Notebook
-
-In your Jupyter notebook, identify figures with a comment:
-
-```python title="my-notebook.ipynb"
-# #my-figure
+````markdown source="tabbed-nbsync"
+```python .md#plot
 import matplotlib.pyplot as plt
 
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.plot([1, 2, 3, 4], [10, 20, 25, 30])
+fig, ax = plt.subplots(figsize=(2, 1))
+ax.plot([1, 3, 2, 4])
 ```
 
-### 4. Reference in Markdown
+![Plot result](){#plot}
+````
 
-Use standard Markdown image syntax with the figure identifier:
+### Python File Integration
 
-```markdown
-![Chart description](my-notebook.ipynb){#my-figure}
+Directly reference external Python files and reuse defined functions or classes.
+Avoid code duplication and improve maintainability.
+
+```python title="plot.py"
+--8<-- "scripts/plot.py"
 ```
 
-## Advanced Usage
+```markdown source="tabbed-nbsync"
+![Plot result](plot.py){#sqrt source="on"}
+```
 
-For more detailed information on how to use nbsync, see:
+### Code Execution in Images
 
-- [Notebook Configuration](usage/notebook.md) - Setting up notebook directories
-- [Display Options](usage/class.md) - Control how notebook content is displayed
-- [Execute Option](usage/execute.md) - Run notebooks during documentation builds
-<!-- - [Workflow Tips](usage/workflow.md) - Best practices for documentation -->
+Execute Python code directly within image notation and display the results.
+This enables easy placement of dynamic visualizations in tables or complex
+layouts.
 
-## The Power of Separation
+```markdown source="tabbed-nbsync"
+|         Sine          |        Cosine         |
+| :-------------------: | :-------------------: |
+| ![](){`plot(np.sin)`} | ![](){`plot(np.cos)`} |
+```
 
-Creating documentation and developing visualizations involve different
-workflows and timeframes. When building visualizations in Jupyter notebooks,
-you need rapid cycles of execution, verification, and modification.
+### Dynamic Updates and Execution
 
-This plugin is designed specifically to address these separation of
-concerns, allowing you to:
+Automatic synchronization between notebooks and documentation ensures code
+changes are reflected in real-time. View changes instantly in MkDocs serve mode.
 
-- **Focus on code** in notebooks without documentation distractions
-- **Focus on narrative** in markdown without code interruptions
-- **Maintain powerful connections** between both environments
+## Getting Started
 
-Each environment is optimized for its purpose, while the plugin
-handles the integration automatically.
+Follow these steps to get started with nbsync:
 
-## Contributing
+1. [Installation](getting-started/installation.md)
+2. [Configuration](getting-started/configuration.md)
+3. [First Steps](getting-started/first-steps.md)
 
-Contributions are welcome! Please open an issue or submit a pull request.
+## Examples
 
-## License
+Explore the possibilities of nbsync through practical examples:
 
-This project is licensed under the MIT License.
+- [Basic Usage](examples/basic.md)
+- [Visualizations in Tables](examples/tables.md)
+- [Advanced Examples](examples/advanced.md)
