@@ -2,29 +2,21 @@
 
 <div class="grid cards" markdown>
 
-- :material-notebook-edit:{ .lg .middle } **Notebooks from Markdown**
-
+- :material-notebook-edit: **Notebooks from Markdown**
   Extend standard markdown syntax to automatically generate notebooks from
   documentation
-
   [:octicons-arrow-right-24: Markdown Features](#notebooks-from-markdown)
 
-- :material-language-python:{ .lg .middle } **Python File Integration**
-
+- :material-language-python: **Python File Integration**
   Directly reference external Python files and reuse functions or classes
-
   [:octicons-arrow-right-24: Python Integration](#python-file-integration)
 
-- :material-image-edit:{ .lg .middle } **Code Execution in Images**
-
+- :material-image-edit: **Code Execution in Images**
   Execute code within image notation for dynamic visualizations
-
   [:octicons-arrow-right-24: Dynamic Visualization](#code-execution-in-images)
 
-- :material-refresh-auto:{ .lg .middle } **Dynamic Updates**
-
+- :material-refresh-auto: **Dynamic Updates**
   Real-time synchronization between notebooks and documentation
-
   [:octicons-arrow-right-24: Dynamic Updates](#dynamic-updates-and-execution)
 
 </div>
@@ -54,7 +46,9 @@ display.
 ````markdown source="tabbed-nbsync"
 ```python .md#plot
 import matplotlib.pyplot as plt
-plt.plot([1, 2, 3, 4])
+
+fig, ax = plt.subplots(figsize=(2, 1))
+ax.plot([1, 3, 2, 4])
 ```
 
 ![Plot result](){#plot}
@@ -65,12 +59,12 @@ plt.plot([1, 2, 3, 4])
 Directly reference external Python files and reuse defined functions or classes.
 Avoid code duplication and improve maintainability.
 
-```markdown source="tabbed-nbsync"
-![](plot.py){#.}
+```python title="plot.py"
+--8<-- "scripts/plot.py"
+```
 
-|    `plot(1)`     |    `plot(2)`     |
-| :--------------: | :--------------: |
-| ![](){`plot(1)`} | ![](){`plot(2)`} |
+```markdown source="tabbed-nbsync"
+![Plot result](plot.py){#sqrt source="on"}
 ```
 
 ### Code Execution in Images
@@ -78,6 +72,12 @@ Avoid code duplication and improve maintainability.
 Execute Python code directly within image notation and display the results.
 This enables easy placement of dynamic visualizations in tables or complex
 layouts.
+
+```markdown source="tabbed-nbsync"
+|         Sine          |        Cosine         |
+| :-------------------: | :-------------------: |
+| ![](){`plot(np.sin)`} | ![](){`plot(np.cos)`} |
+```
 
 ### Dynamic Updates and Execution
 

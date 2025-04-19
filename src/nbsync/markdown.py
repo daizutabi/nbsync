@@ -29,19 +29,15 @@ def parse_image(image: Image) -> Iterator[Element]:
 def parse_code_block(code_block: CodeBlock) -> Iterator[Element]:
     source = code_block.attributes.get("source", None)
     if source != "tabbed-nbsync":
-        if code_block.url:
-            yield code_block
-        else:
-            yield code_block.text
+        yield code_block
         return
 
     markdown = code_block.text.replace('source="tabbed-nbsync"', "")
     markdown = textwrap.indent(markdown, "    ")
-    html = code_block.source
-    html = textwrap.indent(html, "    ")
+    yield f'=== "Markdown"\n\n{markdown}\n\n=== "HTML"\n\n'
 
-    yield f'=== "Markdown"\n{markdown}\n\n=== "HTML"\n'
-    yield from parse(html)
+    text = textwrap.indent(code_block.source, "    ")
+    yield from nbstore.markdown.parse(text)
 
 
 SUPPORTED_EXTENSIONS = (".ipynb", ".md", ".py")
@@ -63,7 +59,7 @@ def parse_url(elems: Iterable[Element]) -> Iterator[Element]:
 
     for elem in elems:
         if isinstance(elem, CodeBlock) and not elem.url:
-            yield elem
+            yield elem.text
 
         elif isinstance(elem, Image | CodeBlock):
             elem_, url = set_url(elem, url)
@@ -73,10 +69,16 @@ def parse_url(elems: Iterable[Element]) -> Iterator[Element]:
             yield elem
 
 
-def parse(text: str) -> Iterator[Element]:
-    elems = nbstore.markdown.parse(text)
+def _parse(text: str) -> Iterator[Element]:
+    for elem in nbstore.markdown.parse(text):
+        if isinstance(elem, CodeBlock):
+            yield from parse_code_block(elem)
+        else:
+            yield elem
 
-    for elem in parse_url(elems):
+
+def parse(text: str) -> Iterator[Element]:
+    for elem in parse_url(_parse(text)):
         if isinstance(elem, CodeBlock):
             yield from parse_code_block(elem)
         elif isinstance(elem, Image):

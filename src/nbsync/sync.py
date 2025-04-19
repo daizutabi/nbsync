@@ -104,7 +104,14 @@ def convert_image(image: Image, nb: NotebookNode) -> Iterator[str | Figure]:
     if source == "only":
         return
 
-    if mime_content := nbstore.notebook.get_mime_content(nb, image.identifier):
+    try:
+        mime_content = nbstore.notebook.get_mime_content(nb, image.identifier)
+    except ValueError:
+        cell = f"{image.url}#{image.identifier}"
+        logger.warning(f"Error reading cell: {cell!r}")
+        return
+
+    if mime_content:
         yield Figure(image, *mime_content).convert()
 
     elif not has_source:
