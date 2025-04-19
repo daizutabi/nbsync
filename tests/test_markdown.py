@@ -3,38 +3,38 @@ import pytest
 from nbstore.markdown import CodeBlock, Image, parse
 
 
-def test_parse_image():
-    from nbsync.markdown import parse_image
+def test_convert_image():
+    from nbsync.markdown import convert_image
 
     text = "![a](b.ipynb){#c}"
     image = next(parse(text))
     assert isinstance(image, Image)
-    image = next(parse_image(image))
+    image = next(convert_image(image))
     assert isinstance(image, Image)
     assert image.alt == "a"
     assert image.url == "b.ipynb"
     assert image.identifier == "c"
 
 
-def test_parse_image_no_identifier():
-    from nbsync.markdown import parse_image
+def test_convert_image_no_identifier():
+    from nbsync.markdown import convert_image
 
     text = "![ a ]( b.ipynb ){  c ' b ' }"
     image = next(parse(text))
     assert isinstance(image, Image)
-    text_ = next(parse_image(image))
+    text_ = next(convert_image(image))
     assert isinstance(text_, str)
     assert text_ == text
 
 
-def test_parse_image_source_with_identifier():
-    from nbsync.markdown import parse_image
+def test_convert_image_source_with_identifier():
+    from nbsync.markdown import convert_image
 
     text = '![a](b.ipynb){#c `x=1` exec="1"}'
     image = next(parse(text))
     assert isinstance(image, Image)
     assert image.source
-    it = parse_image(image)
+    it = convert_image(image)
     code_block = next(it)
     assert isinstance(code_block, CodeBlock)
     assert code_block.text == ""
@@ -52,18 +52,31 @@ def test_parse_image_source_with_identifier():
     assert image.attributes == {"exec": "1"}
 
 
-def test_parse_image_source_without_identifier():
-    from nbsync.markdown import parse_image
+def test_convert_image_source_without_identifier():
+    from nbsync.markdown import convert_image
 
     text = '![a](b.ipynb){`x=1` exec="1"}'
     image = next(parse(text))
     assert isinstance(image, Image)
-    it = parse_image(image)
+    it = convert_image(image)
     code_block = next(it)
     image = next(it)
     assert isinstance(code_block, CodeBlock)
     assert isinstance(image, Image)
     assert code_block.identifier == image.identifier
+
+
+def test_convert_code_block():
+    from nbsync.markdown import convert_code_block
+
+    elems = nbstore.markdown.parse(SOURCE_TAB)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    elems = list(convert_code_block(code_block))
+    assert isinstance(elems[0], str)
+    assert elems[0].startswith("===")
+    assert isinstance(elems[1], CodeBlock)
+    assert elems[1].classes == ["python"]
 
 
 def test_set_url():
@@ -199,16 +212,3 @@ print("Hello Markdown from markdown-exec!")
 ```
 ````
 """
-
-
-def test_parse_code_block():
-    from nbsync.markdown import parse_code_block
-
-    elems = nbstore.markdown.parse(SOURCE_TAB)
-    code_block = list(elems)[0]
-    assert isinstance(code_block, CodeBlock)
-    elems = list(parse_code_block(code_block))
-    assert isinstance(elems[0], str)
-    assert elems[0].startswith("===")
-    assert isinstance(elems[1], CodeBlock)
-    assert elems[1].classes == ["python"]
