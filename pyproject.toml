@@ -5,11 +5,21 @@ build-backend = "hatchling.build"
 [project]
 name = "nbsync"
 version = "0.1.0"
-description = "A MkDocs plugin for seamlessly embedding Jupyter notebook visualizations into documentation with simple Markdown syntax"
+description = "MkDocs plugin treating Jupyter notebooks, Python scripts and Markdown files as first-class citizens for documentation with dynamic execution and real-time synchronization"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "daizutabi", email = "daizutabi@gmail.com" }]
-keywords = ["jupyter", "notebook", "mkdocs"]
+keywords = [
+  "jupyter",
+  "notebook",
+  "mkdocs",
+  "documentation",
+  "markdown",
+  "python",
+  "visualization",
+  "dynamic-execution",
+  "real-time-sync",
+]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -22,7 +32,7 @@ classifiers = [
   "Topic :: Text Processing :: Markup :: Markdown",
 ]
 requires-python = ">=3.10"
-dependencies = ["mkdocs>=1.6", "nbstore>=0.4.5"]
+dependencies = ["mkdocs>=1.6", "nbstore>=0.4.7"]
 
 [project.urls]
 Documentation = "https://daizutabi.github.io/nbsync/"
@@ -35,7 +45,6 @@ nbsync = "nbsync.plugin:Plugin"
 [dependency-groups]
 dev = [
   "ipykernel>=6.29.5",
-  "markdown-exec>=1.10",
   "matplotlib>=3.10.1",
   "mkdocs-material>=9.6.11",
   "nbconvert>=7.16.6",
@@ -57,6 +66,7 @@ exclude_lines = [
   "except ImportError",
   "if TYPE_CHECKING:",
   "raise NotImplementedError",
+  "no cov",
 ]
 skip_covered = true
 
@@ -67,7 +77,7 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["ALL"]
 unfixable = ["F401"]
-ignore = ["ANN401", "ARG001", "ARG002", "C901", "D", "S105"]
+ignore = ["ANN401", "ARG001", "ARG002", "C901", "D", "PLR0911", "S105"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = ["ANN", "ARG", "D", "FBT", "PLR", "RUF", "S", "PGH003"]

@@ -44,14 +44,14 @@ documentation. Present code and its output results concisely with tabbed
 display.
 
 ````markdown source="tabbed-nbsync"
-```python .md#plot
+```python .md#plot source="on"
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(2, 1))
-ax.plot([1, 3, 2, 4])
+ax.plot([1, 3, 3, 4])
 ```
 
-![Plot result](){#plot}
+![Plot result](){#plot source="on"}
 ````
 
 ### Python File Integration

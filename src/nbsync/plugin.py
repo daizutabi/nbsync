@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from mkdocs.structure.files import Files
     from mkdocs.structure.pages import Page
 
-    from .figure import Figure
+    from .cell import Cell
 
 
 class Config(BaseConfig):
@@ -47,7 +47,7 @@ class Plugin(BasePlugin[Config]):
             self.__class__.store = Store(src_dirs)
             config.watch.extend(x.as_posix() for x in src_dirs)
 
-        for name in ["attr_list"]:
+        for name in ["attr_list", "md_in_html"]:
             if name not in config.markdown_extensions:
                 config.markdown_extensions.append(name)
 
@@ -67,7 +67,7 @@ class Plugin(BasePlugin[Config]):
         if self.__class__.store is None:
             msg = "Store must be initialized before processing markdown"
             logger.error(msg)
-            raise RuntimeError(msg)
+            return markdown
 
         src_uri = page.file.src_uri
         syncs = self.__class__.syncs
@@ -81,19 +81,16 @@ class Plugin(BasePlugin[Config]):
             if isinstance(elem, str):
                 markdowns.append(elem)
 
-            elif elem.content:
-                markdowns.append(elem.markdown)
-                file = generate_file(elem, src_uri, config)
-                self.files.append(file)
+            elif markdown := elem.convert():
+                markdowns.append(markdown)
 
-        print("".join(markdowns))
+                if elem.image.url and elem.content:
+                    file = generate_file(elem, src_uri, config)
+                    self.files.append(file)
+
         return "".join(markdowns)
 
 
-def generate_file(fig: Figure, page_uri: str, config: MkDocsConfig) -> File:
-    src_uri = (Path(page_uri).parent / fig.src).as_posix()
-
-    info = f"{fig.image.url}#{fig.image.identifier} ({fig.mime}) -> {src_uri}"
-    logger.debug(f"Creating image: {info}")
-
-    return File.generated(config, src_uri, content=fig.content)
+def generate_file(cell: Cell, page_uri: str, config: MkDocsConfig) -> File:
+    src_uri = (Path(page_uri).parent / cell.image.url).as_posix()
+    return File.generated(config, src_uri, content=cell.content)
