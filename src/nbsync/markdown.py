@@ -40,7 +40,7 @@ def _convert_code_block_tabbed(code_block: CodeBlock) -> Iterator[Element]:
     yield f'=== "Markdown"\n\n{markdown}\n\n'
 
     text = textwrap.indent(code_block.source, "    ")
-    text = f'=== "HTML"\n\n{text}'
+    text = f'=== "Rendered"\n\n{text}'
     yield from nbstore.markdown.parse(text)
 
 

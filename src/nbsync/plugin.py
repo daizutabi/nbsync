@@ -47,7 +47,7 @@ class Plugin(BasePlugin[Config]):
             self.__class__.store = Store(src_dirs)
             config.watch.extend(x.as_posix() for x in src_dirs)
 
-        for name in ["attr_list"]:
+        for name in ["attr_list", "md_in_html"]:
             if name not in config.markdown_extensions:
                 config.markdown_extensions.append(name)
 
@@ -81,19 +81,16 @@ class Plugin(BasePlugin[Config]):
             if isinstance(elem, str):
                 markdowns.append(elem)
 
-            elif elem.content:
-                markdowns.append(elem.markdown)
-                file = generate_file(elem, src_uri, config)
-                self.files.append(file)
+            elif markdown := elem.convert():
+                markdowns.append(markdown)
 
-        print("".join(markdowns))
+                if elem.image.url and elem.content:
+                    file = generate_file(elem, src_uri, config)
+                    self.files.append(file)
+
         return "".join(markdowns)
 
 
 def generate_file(cell: Cell, page_uri: str, config: MkDocsConfig) -> File:
-    src_uri = (Path(page_uri).parent / cell.src).as_posix()
-
-    info = f"{cell.image.url}#{cell.image.identifier} ({cell.mime}) -> {src_uri}"
-    logger.debug(f"Creating image: {info}")
-
+    src_uri = (Path(page_uri).parent / cell.image.url).as_posix()
     return File.generated(config, src_uri, content=cell.content)

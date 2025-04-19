@@ -1,6 +1,16 @@
 # nbsync
 
-<div class="grid cards" markdown>
+```markdown source="tabbed-nbsync"
+![alt](class.ipynb){#image source="material-block"}
+```
+
+```python .md#text
+4+3
+```
+
+![alt](.md){#text source="tabbed-right"}
+
+<!-- <div class="grid cards" markdown>
 
 - :material-notebook-edit: **Notebooks from Markdown**
   Extend standard markdown syntax to automatically generate notebooks from
@@ -100,4 +110,4 @@ Explore the possibilities of nbsync through practical examples:
 
 - [Basic Usage](examples/basic.md)
 - [Visualizations in Tables](examples/tables.md)
-- [Advanced Examples](examples/advanced.md)
+- [Advanced Examples](examples/advanced.md) -->

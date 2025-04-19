@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import textwrap
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from typing import Self
+from nbsync.markdown import is_truelike
 
+from .logger import logger
+
+if TYPE_CHECKING:
     from nbstore.markdown import Image
 
 
@@ -24,29 +27,73 @@ class Cell:
     content: bytes | str
     """The content of the image."""
 
-    src: str = field(default="", init=False)
-    """The source URI of the image in MkDocs."""
+    def convert(self) -> str:
+        kind = self.image.attributes.pop("source", "")
+        tabs = self.image.attributes.pop("tabs", "")
 
-    def convert(self) -> Self | str:
-        if self.mime.startswith("text/") and isinstance(self.content, str):
-            return self.content
+        source = get_source(self)
 
-        ext = self.mime.split("/")[1].split("+")[0]
-        self.src = f"{uuid.uuid4()}.{ext}"
-        return self
+        if "/" not in self.mime or not self.content:
+            result, self.image.url = "", ""
 
-    @property
-    def markdown(self) -> str:
-        src = self.src or self.image.url
-        attr = " ".join(self.image.iter_parts(include_identifier=True))
-        return f"![{self.image.alt}]({src}){{{attr}}}"
+        elif self.mime.startswith("text/") and isinstance(self.content, str):
+            result, self.image.url = self.content, ""
+
+        else:
+            result = get_result(self)
+
+        if markdown := get_markdown(kind, source, result, tabs):
+            return textwrap.indent(markdown, self.image.indent)
+
+        return ""
 
 
-# def get_source_from_image(image: Image, nb: NotebookNode) -> str:
-#     source = nbstore.notebook.get_source(nb, image.identifier)
-#     if not source:
-#         return ""
+def get_source(cell: Cell) -> str:
+    attr = " ".join([cell.language, *cell.image.iter_parts()])
+    return f"```{attr}\n{cell.image.source}\n```"
 
-#     language = nbstore.notebook.get_language(nb)
-#     attr = " ".join([language, *image.iter_parts()])
-#     return f"```{attr}\n{source}\n```"
+
+def get_result(cell: Cell) -> str:
+    msg = f"{cell.image.url}#{cell.image.identifier} [{cell.mime}]"
+    logger.info(f"Converting image: {msg}")
+
+    ext = cell.mime.split("/")[1].split("+")[0]
+    cell.image.url = f"{uuid.uuid4()}.{ext}"
+
+    attr = " ".join(cell.image.iter_parts(include_identifier=True))
+    return f"![{cell.image.alt}]({cell.image.url}){{{attr}}}"
+
+
+def get_markdown(kind: str, source: str, result: str, tabs: str) -> str:
+    if all(not x for x in (kind, source, result)):
+        return ""
+
+    if not kind or not source:
+        return result
+
+    if is_truelike(kind) or kind == "above":
+        return f"{source}\n\n{result}"
+
+    if kind == "below":
+        return f"{result}\n\n{source}"
+
+    if kind == "material-block":
+        result = f'<div class="result" markdown="1">{result}</div>'
+        return f"{source}\n\n{result}"
+
+    if kind == "tabbed-left":
+        return get_tabbed(source, result, tabs or "Source|Result")
+
+    if kind == "tabbed-right":
+        return get_tabbed(result, source, tabs or "Result|Source")
+
+    return result
+
+
+def get_tabbed(left: str, right: str, tabs: str) -> str:
+    left_title, right_title = tabs.split("|", 1)
+    left = textwrap.indent(left, "    ")
+    left = f'===! "{left_title}"\n\n{left}'
+    right = textwrap.indent(right, "    ")
+    right = f'=== "{right_title}"\n\n{right}'
+    return f"{left}\n\n{right}\n"
