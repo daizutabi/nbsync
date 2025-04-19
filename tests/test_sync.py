@@ -54,21 +54,21 @@ def test_get_source_none(nb):
 
 
 def test_convert_image(nb):
-    from nbsync.figure import Figure
+    from nbsync.cell import Cell
     from nbsync.sync import convert_image
 
     image = Image("abc", "id", [], {}, "", "a.py")
     x = list(convert_image(image, nb))
     assert len(x) == 1
     fig = x[0]
-    assert isinstance(fig, Figure)
+    assert isinstance(fig, Cell)
     assert fig.content == "2\n"
     assert fig.mime == "text/plain"
-    assert fig.src == ""
+    assert fig.uri == ""
 
 
 def test_convert_image_source(nb):
-    from nbsync.figure import Figure
+    from nbsync.cell import Cell
     from nbsync.sync import convert_image
 
     image = Image("abc", "id", [], {"source": "1"}, "", "a.py")
@@ -76,7 +76,7 @@ def test_convert_image_source(nb):
     x = list(convert_image(image, nb))
     assert len(x) == 2
     assert x[0] == source
-    assert isinstance(x[1], Figure)
+    assert isinstance(x[1], Cell)
 
 
 def test_convert_image_source_only(nb):

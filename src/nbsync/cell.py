@@ -11,9 +11,15 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class Figure:
+class Cell:
     image: Image
     """The image instance from the Markdown file."""
+
+    source: str
+    """The source used to generate the image."""
+
+    kind: str
+    """The kind of cell. Set from the source attribute of the image."""
 
     mime: str
     """The MIME type of the image."""
@@ -21,7 +27,7 @@ class Figure:
     content: bytes | str
     """The content of the image."""
 
-    src: str = field(default="", init=False)
+    uri: str = field(default="", init=False)
     """The source URI of the image in MkDocs."""
 
     def convert(self) -> Self | str:
@@ -29,11 +35,11 @@ class Figure:
             return self.content
 
         ext = self.mime.split("/")[1].split("+")[0]
-        self.src = f"{uuid.uuid4()}.{ext}"
+        self.uri = f"{uuid.uuid4()}.{ext}"
         return self
 
     @property
     def markdown(self) -> str:
-        src = self.src or self.image.url
+        src = self.uri or self.image.url
         attr = " ".join(self.image.iter_parts(include_identifier=True))
         return f"![{self.image.alt}]({src}){{{attr}}}"

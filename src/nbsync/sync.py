@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import textwrap
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -10,7 +9,7 @@ import nbstore.notebook
 from nbstore.markdown import CodeBlock, Image
 
 import nbsync.markdown
-from nbsync.figure import Figure
+from nbsync.cell import Cell
 from nbsync.notebook import Notebook
 
 from .logger import logger
@@ -49,7 +48,7 @@ class Synchronizer:
             logger.info(f"Executing notebook: {path}")
             notebook.execute()
 
-    def convert(self, text: str) -> Iterator[str | Figure]:
+    def convert(self, text: str) -> Iterator[str | Cell]:
         elems = list(self.parse(text))
         self.execute()
 
@@ -60,9 +59,9 @@ class Synchronizer:
             elif elem.identifier not in [".", "_"]:
                 if isinstance(elem, Image):
                     nb = self.notebooks[elem.url].nb
-                    yield from convert_image(elem, nb)
+                    yield convert_image(elem, nb)
                 else:
-                    yield from convert_code_block(elem)
+                    yield convert_code_block(elem)
 
 
 def update_notebooks(
@@ -96,26 +95,21 @@ def is_truelike(value: str | None) -> bool:
     return value is not None and value.lower() in ("yes", "true", "1", "on")
 
 
-def convert_image(image: Image, nb: NotebookNode) -> Iterator[str | Figure]:
-    source = image.attributes.pop("source", None)
-    if has_source := (is_truelike(source) or source == "only"):
-        yield get_source_from_image(image, nb)
-
-    if source == "only":
-        return
+def convert_image(image: Image, nb: NotebookNode) -> Cell:
+    kind = image.attributes.pop("source", None) or "off"
+    source = get_source_from_image(image, nb)
 
     try:
         mime_content = nbstore.notebook.get_mime_content(nb, image.identifier)
     except ValueError:
         cell = f"{image.url}#{image.identifier}"
         logger.warning(f"Error reading cell: {cell!r}")
-        return
+        mime_content = ("", "")
 
-    if mime_content:
-        yield Figure(image, *mime_content).convert()
+    if mime_content is None:
+        mime_content = ("", "")
 
-    elif not has_source:
-        yield get_source_from_image(image, nb)
+    return Cell(image, source, kind, *mime_content)
 
 
 def get_source_from_image(image: Image, nb: NotebookNode) -> str:

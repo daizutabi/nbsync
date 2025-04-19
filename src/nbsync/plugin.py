@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from mkdocs.structure.files import Files
     from mkdocs.structure.pages import Page
 
-    from .figure import Figure
+    from .cell import Cell
 
 
 class Config(BaseConfig):
@@ -90,8 +90,8 @@ class Plugin(BasePlugin[Config]):
         return "".join(markdowns)
 
 
-def generate_file(fig: Figure, page_uri: str, config: MkDocsConfig) -> File:
-    src_uri = (Path(page_uri).parent / fig.src).as_posix()
+def generate_file(fig: Cell, page_uri: str, config: MkDocsConfig) -> File:
+    src_uri = (Path(page_uri).parent / fig.uri).as_posix()
 
     info = f"{fig.image.url}#{fig.image.identifier} ({fig.mime}) -> {src_uri}"
     logger.debug(f"Creating image: {info}")
