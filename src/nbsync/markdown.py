@@ -103,3 +103,7 @@ def parse(text: str) -> Iterator[Element]:
     elems = convert_code_blocks(elems)
     elems = resolve_urls(elems)
     yield from convert_images(elems)
+
+
+def is_truelike(value: str | None) -> bool:
+    return value is not None and value.lower() in ("yes", "true", "1", "on")

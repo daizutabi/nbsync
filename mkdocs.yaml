@@ -46,7 +46,6 @@ plugins:
       src_dir:
         - ../notebooks
         - ../scripts
-  - markdown-exec
 markdown_extensions:
   - admonition
   - attr_list

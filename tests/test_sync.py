@@ -4,25 +4,8 @@ import pytest
 from nbstore import Store
 from nbstore.markdown import CodeBlock, Image
 
-
-@pytest.mark.parametrize(
-    ("value", "expected"),
-    [
-        ("1", True),
-        ("0", False),
-        ("yes", True),
-        ("no", False),
-        ("true", True),
-        ("false", False),
-        ("on", True),
-        ("off", False),
-    ],
-)
-def test_is_truelike(value, expected):
-    from nbsync.sync import is_truelike
-
-    assert is_truelike(value) == expected
-    assert is_truelike(value.upper()) == expected
+from nbsync.cell import Cell
+from nbsync.sync import Synchronizer
 
 
 @pytest.fixture(scope="module")
@@ -39,60 +22,27 @@ def nb():
     return nb
 
 
-def test_get_source(nb):
-    from nbsync.sync import get_source_from_image
-
-    image = Image("abc", "id", [], {}, "", "a.py")
-    assert get_source_from_image(image, nb) == "```{.python}\nprint(1+1)\n```\n\n"
-
-
-def test_get_source_none(nb):
-    from nbsync.sync import get_source_from_image
-
-    image = Image("abc", "empty", [], {}, "", "a.py")
-    assert get_source_from_image(image, nb) == ""
-
-
 def test_convert_image(nb):
-    from nbsync.cell import Cell
     from nbsync.sync import convert_image
 
     image = Image("abc", "id", [], {}, "", "a.py")
-    x = list(convert_image(image, nb))
-    assert len(x) == 1
-    fig = x[0]
-    assert isinstance(fig, Cell)
-    assert fig.content == "2\n"
-    assert fig.mime == "text/plain"
-    assert fig.uri == ""
+    x = convert_image(image, nb)
+    assert isinstance(x, Cell)
+    assert x.image.source == "print(1+1)"
+    assert x.content == "2\n"
+    assert x.mime == "text/plain"
+    assert x.src == ""
 
 
-def test_convert_image_source(nb):
-    from nbsync.cell import Cell
+def test_convert_image_invalid(nb):
     from nbsync.sync import convert_image
 
-    image = Image("abc", "id", [], {"source": "1"}, "", "a.py")
-    source = "```{.python}\nprint(1+1)\n```\n\n"
-    x = list(convert_image(image, nb))
-    assert len(x) == 2
-    assert x[0] == source
-    assert isinstance(x[1], Cell)
-
-
-def test_convert_image_source_only(nb):
-    from nbsync.sync import convert_image
-
-    image = Image("abc", "id", [], {"source": "only"}, "", "a.py")
-    x = "```{.python}\nprint(1+1)\n```\n\n"
-    assert list(convert_image(image, nb)) == [x]
-
-
-def test_convert_image_fallback(nb):
-    from nbsync.sync import convert_image
-
-    image = Image("abc", "func", [], {}, "", "a.py")
-    x = "```{.python}\ndef f():\n    pass\n```\n\n"
-    assert list(convert_image(image, nb)) == [x]
+    image = Image("abc", "invalid", [], {}, "", "a.py")
+    x = convert_image(image, nb)
+    assert isinstance(x, Cell)
+    assert x.image.source == ""
+    assert x.content == ""
+    assert x.mime == ""
 
 
 @pytest.fixture(scope="module")
@@ -146,3 +96,69 @@ def test_update_notebooks_self(store: Store):
     assert len(notebooks) == 1
     notebook = notebooks[".md"]
     assert len(notebook.nb.cells) == 1
+
+
+def test_update_notebooks_error(store: Store):
+    from nbsync.sync import Notebook, update_notebooks
+
+    notebooks: dict[str, Notebook] = {}
+    code_block = CodeBlock("abc", "id2", [], {}, "123", "invalid.md")
+    update_notebooks(notebooks, code_block, store)
+    assert len(notebooks) == 0
+
+
+def test_convert_code_block_none():
+    from nbsync.sync import convert_code_block
+
+    code_block = CodeBlock("abc", "id2", [], {}, "123", "a.ipynb")
+    assert convert_code_block(code_block) == ""
+
+
+def test_convert_code_block_brace():
+    from nbsync.sync import convert_code_block
+
+    text = '  ```{.python a#id source="on"}\n  a\n  ```'
+    code_block = CodeBlock(text, "id", [], {"source": "on"}, "", "")
+    x = "  ```{.python  }\n  a\n  ```"
+    assert convert_code_block(code_block) == x
+
+
+def test_convert_code_block_space():
+    from nbsync.sync import convert_code_block
+
+    text = '  ```.python a#id source="on" abc\n  a\n  ```'
+    code_block = CodeBlock(text, "id", [], {"source": "on"}, "", "")
+    x = "  ```.python   abc\n  a\n  ```"
+    assert convert_code_block(code_block) == x
+
+
+@pytest.fixture
+def sync(store: Store):
+    return Synchronizer(store)
+
+
+def test_sync_str(sync: Synchronizer):
+    x = list(sync.convert("abc"))
+    assert x[0] == "abc"
+
+
+def test_sync_image(sync: Synchronizer):
+    x = next(sync.convert('![](a.ipynb){#id exec="1"}'))
+    assert isinstance(x, Cell)
+    assert x.image.source == "print(1+1)"
+    assert x.content == "2\n"
+    assert x.mime == "text/plain"
+    assert x.src == ""
+    notebook = sync.notebooks["a.ipynb"]
+    x = next(sync.convert('![](a.ipynb){#id exec="1"}'))
+    assert isinstance(x, Cell)
+    assert x.image.source == "print(1+1)"
+    assert x.content == "2\n"
+    assert notebook is sync.notebooks["a.ipynb"]
+    assert notebook.nb is sync.notebooks["a.ipynb"].nb
+
+
+def test_sync_code_block(sync: Synchronizer):
+    x = next(sync.convert("```a b.md#c source=1\nc\n```"))
+    assert isinstance(x, str)
+    assert x == "```a  \nc\n```"

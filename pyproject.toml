@@ -35,7 +35,6 @@ nbsync = "nbsync.plugin:Plugin"
 [dependency-groups]
 dev = [
   "ipykernel>=6.29.5",
-  "markdown-exec>=1.10",
   "matplotlib>=3.10.1",
   "mkdocs-material>=9.6.11",
   "nbconvert>=7.16.6",

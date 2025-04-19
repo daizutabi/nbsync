@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import re
 import textwrap
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import nbformat
-import nbstore.notebook
 from nbstore.markdown import CodeBlock, Image
+from nbstore.notebook import get_language, get_mime_content, get_source
 
 import nbsync.markdown
 from nbsync.cell import Cell
+from nbsync.markdown import is_truelike
 from nbsync.notebook import Notebook
 
 from .logger import logger
@@ -91,42 +93,29 @@ def update_notebooks(
         notebook.add_cell(elem.identifier, source)
 
 
-def is_truelike(value: str | None) -> bool:
-    return value is not None and value.lower() in ("yes", "true", "1", "on")
-
-
 def convert_image(image: Image, nb: NotebookNode) -> Cell:
-    kind = image.attributes.pop("source", None) or "off"
-    source = get_source_from_image(image, nb)
-
     try:
-        mime_content = nbstore.notebook.get_mime_content(nb, image.identifier)
+        image.source = get_source(nb, image.identifier)
+        mime_content = get_mime_content(nb, image.identifier)
     except ValueError:
         cell = f"{image.url}#{image.identifier}"
         logger.warning(f"Error reading cell: {cell!r}")
+        image.source = ""
         mime_content = ("", "")
 
-    if mime_content is None:
-        mime_content = ("", "")
-
-    return Cell(image, source, kind, *mime_content)
-
-
-def get_source_from_image(image: Image, nb: NotebookNode) -> str:
-    source = nbstore.notebook.get_source(nb, image.identifier)
-    if not source:
-        return ""
-
-    language = nbstore.notebook.get_language(nb)
-    attr = " ".join([language, *image.iter_parts()])
-    return f"```{attr}\n{source}\n```"
+    return Cell(image, get_language(nb), *mime_content)
 
 
 def convert_code_block(code_block: CodeBlock) -> str:
     source = code_block.attributes.pop("source", None)
-    if is_truelike(source):
-        attr = " ".join(code_block.iter_parts())
-        text = f"```{attr}\n{code_block.source}\n```"
-        return textwrap.indent(text, code_block.indent)
+    if not is_truelike(source):
+        return ""
 
-    return ""
+    lines = code_block.text.splitlines()
+    if lines:
+        pattern = f"\\S+#{code_block.identifier}"
+        lines[0] = re.sub(pattern, "", lines[0])
+        pattern = r"source=[^\s}]+"
+        lines[0] = re.sub(pattern, "", lines[0])
+
+    return "\n".join(lines)

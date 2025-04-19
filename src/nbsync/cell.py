@@ -15,11 +15,8 @@ class Cell:
     image: Image
     """The image instance from the Markdown file."""
 
-    source: str
-    """The source used to generate the image."""
-
-    kind: str
-    """The kind of cell. Set from the source attribute of the image."""
+    language: str
+    """The language of the source to be used to generate the image."""
 
     mime: str
     """The MIME type of the image."""
@@ -27,7 +24,7 @@ class Cell:
     content: bytes | str
     """The content of the image."""
 
-    uri: str = field(default="", init=False)
+    src: str = field(default="", init=False)
     """The source URI of the image in MkDocs."""
 
     def convert(self) -> Self | str:
@@ -35,11 +32,21 @@ class Cell:
             return self.content
 
         ext = self.mime.split("/")[1].split("+")[0]
-        self.uri = f"{uuid.uuid4()}.{ext}"
+        self.src = f"{uuid.uuid4()}.{ext}"
         return self
 
     @property
     def markdown(self) -> str:
-        src = self.uri or self.image.url
+        src = self.src or self.image.url
         attr = " ".join(self.image.iter_parts(include_identifier=True))
         return f"![{self.image.alt}]({src}){{{attr}}}"
+
+
+# def get_source_from_image(image: Image, nb: NotebookNode) -> str:
+#     source = nbstore.notebook.get_source(nb, image.identifier)
+#     if not source:
+#         return ""
+
+#     language = nbstore.notebook.get_language(nb)
+#     attr = " ".join([language, *image.iter_parts()])
+#     return f"```{attr}\n{source}\n```"

@@ -67,7 +67,7 @@ class Plugin(BasePlugin[Config]):
         if self.__class__.store is None:
             msg = "Store must be initialized before processing markdown"
             logger.error(msg)
-            raise RuntimeError(msg)
+            return markdown
 
         src_uri = page.file.src_uri
         syncs = self.__class__.syncs
@@ -90,10 +90,10 @@ class Plugin(BasePlugin[Config]):
         return "".join(markdowns)
 
 
-def generate_file(fig: Cell, page_uri: str, config: MkDocsConfig) -> File:
-    src_uri = (Path(page_uri).parent / fig.uri).as_posix()
+def generate_file(cell: Cell, page_uri: str, config: MkDocsConfig) -> File:
+    src_uri = (Path(page_uri).parent / cell.src).as_posix()
 
-    info = f"{fig.image.url}#{fig.image.identifier} ({fig.mime}) -> {src_uri}"
+    info = f"{cell.image.url}#{cell.image.identifier} ({cell.mime}) -> {src_uri}"
     logger.debug(f"Creating image: {info}")
 
-    return File.generated(config, src_uri, content=fig.content)
+    return File.generated(config, src_uri, content=cell.content)

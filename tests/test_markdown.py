@@ -236,3 +236,23 @@ def test_elems_9(elems):
 
 def test_elems_10(elems):
     assert elems[10] == "\n"
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1", True),
+        ("0", False),
+        ("yes", True),
+        ("no", False),
+        ("true", True),
+        ("false", False),
+        ("on", True),
+        ("off", False),
+    ],
+)
+def test_is_truelike(value, expected):
+    from nbsync.markdown import is_truelike
+
+    assert is_truelike(value) == expected
+    assert is_truelike(value.upper()) == expected
