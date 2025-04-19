@@ -5,11 +5,21 @@ build-backend = "hatchling.build"
 [project]
 name = "nbsync"
 version = "0.1.0"
-description = "A MkDocs plugin for seamlessly embedding Jupyter notebook visualizations into documentation with simple Markdown syntax"
+description = "MkDocs plugin treating Jupyter notebooks, Python scripts and Markdown files as first-class citizens for documentation with dynamic execution and real-time synchronization"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "daizutabi", email = "daizutabi@gmail.com" }]
-keywords = ["jupyter", "notebook", "mkdocs"]
+keywords = [
+  "jupyter",
+  "notebook",
+  "mkdocs",
+  "documentation",
+  "markdown",
+  "python",
+  "visualization",
+  "dynamic-execution",
+  "real-time-sync",
+]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
