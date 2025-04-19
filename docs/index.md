@@ -23,17 +23,42 @@
 
 ## What is nbsync?
 
-nbsync is an innovative plugin that seamlessly connects Jupyter notebooks with
-MkDocs documentation. Going beyond traditional notebook integration, it provides
-functionality to generate and execute notebooks directly from markdown (.md)
-files and Python (.py) files.
+nbsync is an innovative MkDocs plugin that treats Jupyter notebooks,
+Python scripts, and Markdown files as first-class citizens for
+documentation. Unlike traditional approaches, nbsync provides equal
+capabilities across all file formats, enabling seamless integration
+and dynamic execution with real-time synchronization.
 
 It solves common challenges faced by data scientists, researchers, and technical
 writers:
 
 - **Development happens in notebooks** - ideal for experimentation and visualization
 - **Documentation lives in markdown** - perfect for narrative and explanation
+- **Code resides in Python files** - organized and version-controlled
 - **Traditional integration is challenging** - screenshots break, exports get outdated
+
+## Inspiration & Comparison
+
+nbsync was inspired by and builds upon the excellent work of two MkDocs
+plugins:
+
+- [**markdown-exec**](https://pawamoy.github.io/markdown-exec/) - Provides utilities to execute code blocks in Markdown files
+- [**mkdocs-jupyter**](https://mkdocs-jupyter.danielfrg.com/) - Enables embedding Jupyter notebooks in MkDocs
+
+While these plugins offer great functionality, nbsync takes a unified
+approach by:
+
+1. **Equal treatment** - Unlike other solutions that prioritize one format, nbsync treats Jupyter notebooks, Python scripts, and Markdown files equally as first-class citizens
+2. **Real-time synchronization** - Changes to source files are immediately reflected in documentation
+3. **Seamless integration** - Consistent syntax across all file formats allows for flexible documentation workflows
+4. **Image syntax code execution** - Unique ability to execute code and embed visualizations anywhere Markdown image syntax (`![alt](url)`) is valid, including tables, lists, and complex layouts
+
+## Acknowledgements
+
+The development of nbsync would not have been possible without the
+groundwork laid by markdown-exec and mkdocs-jupyter. We extend our
+sincere gratitude to the developers of these projects for their
+innovative contributions to the documentation ecosystem.
 
 ## Key Features
 
@@ -44,20 +69,20 @@ documentation. Present code and its output results concisely with tabbed
 display.
 
 ````markdown source="tabbed-nbsync"
-```python .md#plot source="on"
+```python .md#plot
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(2, 1))
 ax.plot([1, 3, 3, 4])
 ```
 
-![Plot result](){#plot source="on"}
+![Plot result](){#plot source="above"}
 ````
 
 ### Python File Integration
 
-Directly reference external Python files and reuse defined functions or classes.
-Avoid code duplication and improve maintainability.
+Directly reference external Python files and reuse defined functions or
+classes. Avoid code duplication and improve maintainability.
 
 ```python title="plot.py"
 --8<-- "scripts/plot.py"
@@ -82,7 +107,8 @@ layouts.
 ### Dynamic Updates and Execution
 
 Automatic synchronization between notebooks and documentation ensures code
-changes are reflected in real-time. View changes instantly in MkDocs serve mode.
+changes are reflected in real-time. View changes instantly in MkDocs serve
+mode.
 
 ## Getting Started
 

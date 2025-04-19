@@ -63,16 +63,16 @@ markdown_extensions:
       permalink: true
 nav:
   - Home: index.md
+  - Getting Started:
+      - getting-started/installation.md
+      - getting-started/configuration.md
+      - getting-started/first-steps.md
   # - Features:
   #     - features/overview.md
   #     - features/markdown.md
   #     - features/python.md
   #     - features/images.md
   #     - features/dynamic.md
-  # - Getting Started:
-  #     - getting-started/installation.md
-  #     - getting-started/configuration.md
-  #     - getting-started/first-steps.md
   # - Usage:
   #     - usage/notebook.md
   #     - usage/python-files.md

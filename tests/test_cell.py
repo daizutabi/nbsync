@@ -58,8 +58,8 @@ def test_image(convert):
 
 
 def test_func(convert):
-    x = convert("![a](a.ipynb){#func a=b c}")
-    assert x == "```python c a=b\ndef f():\n    pass\n```"
+    x = convert("![a](a.ipynb){#func a=b c identifier='1'}")
+    assert x == "```python c a=b\n# #func\ndef f():\n    pass\n```"
 
 
 @pytest.mark.parametrize("kind", ["above", "on", "1"])

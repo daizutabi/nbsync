@@ -42,8 +42,10 @@ plugins:
 
 ### 1. Prepare a Jupyter Notebook
 
-Create or use an existing notebook with visualizations. Tag cells you want to
-reference with a comment:
+Create or use an existing notebook with visualizations.
+Tag cells you want to reference with a comment:
+
+![](analysis.ipynb){#simple-plot source="only"}
 
 ```python
 # In your notebook
@@ -122,7 +124,7 @@ Let's demonstrate different plots:
 
 Create a file `docs/custom.md`:
 
-````markdown
+`````markdown
 # Custom Analysis
 
 Here's an analysis created directly in markdown:
@@ -140,6 +142,8 @@ data = pd.DataFrame({
 })
 ```
 ````
+`````
+
 ````
 
 ```python .md#scatter
@@ -197,3 +201,4 @@ Now that you have the basics working, you can:
    - Hard refresh your browser
    - Restart the MkDocs server
    - Check file paths and identifiers
+````

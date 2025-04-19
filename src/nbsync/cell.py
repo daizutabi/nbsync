@@ -30,22 +30,35 @@ class Cell:
     def convert(self) -> str:
         kind = self.image.attributes.pop("source", "")
         tabs = self.image.attributes.pop("tabs", "")
+        identifier = self.image.attributes.pop("identifier", "")
 
         if "/" not in self.mime or not self.content or kind == "source-only":
             if self.image.source:
-                source = get_source(self, include_attrs=True)
+                source = get_source(
+                    self,
+                    include_attrs=True,
+                    include_identifier=bool(identifier),
+                )
                 kind = "only"
             else:
                 source = ""
             result, self.image.url = "", ""
 
         elif self.mime.startswith("text/") and isinstance(self.content, str):
-            source = get_source(self, include_attrs=True)
+            source = get_source(
+                self,
+                include_attrs=True,
+                include_identifier=bool(identifier),
+            )
             result, self.image.url = self.content, ""
             result = result.rstrip()
 
         else:
-            source = get_source(self, include_attrs=False)
+            source = get_source(
+                self,
+                include_attrs=False,
+                include_identifier=bool(identifier),
+            )
             result = get_result(self)
 
         if markdown := get_markdown(kind, source, result, tabs):
@@ -54,12 +67,22 @@ class Cell:
         return ""  # no cov
 
 
-def get_source(cell: Cell, *, include_attrs: bool = False) -> str:
+def get_source(
+    cell: Cell,
+    *,
+    include_attrs: bool = False,
+    include_identifier: bool = False,
+) -> str:
     attrs = [cell.language]
     if include_attrs:
         attrs.extend(cell.image.iter_parts())
     attr = " ".join(attrs)
-    return f"```{attr}\n{cell.image.source}\n```"
+
+    source = cell.image.source
+    if include_identifier:
+        source = f"# #{cell.image.identifier}\n{source}"
+
+    return f"```{attr}\n{source}\n```"
 
 
 def get_result(cell: Cell) -> str:
