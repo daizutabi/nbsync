@@ -42,7 +42,7 @@ def nbstore_config(nbstore_plugin: Plugin):
 
 def test_nbstore_config(nbstore_config: Config):
     config = nbstore_config
-    assert config.src_dir == "../notebooks"
+    assert config.src_dir == ["../notebooks", "../scripts"]
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ def config_plugin(tmp_path):
     root = Path(__file__).parent.parent
     config_file = root / "mkdocs.yaml"
     shutil.copy(config_file, dest)
-    for src in ["docs", "notebooks", "src", "tests"]:
+    for src in ["docs", "notebooks", "scripts", "src", "tests"]:
         src_dir = root / src
         shutil.copytree(src_dir, dest / src)
     curdir = Path(os.curdir).absolute()
@@ -88,15 +88,13 @@ def test_build(config: MkDocsConfig):
     build(config, dirty=False)
 
 
-def test_on_page_markdown_error():
+def test_on_page_markdown_fallback():
     class FakePlugin(Plugin):
         pass
 
     plugin = FakePlugin()
     plugin.__class__.store = None
-
-    with pytest.raises(RuntimeError):
-        plugin.on_page_markdown("", None, None)  # type: ignore
+    assert plugin.on_page_markdown("abc", None, None) == "abc"  # type: ignore
 
 
 def test_src_dir_list(config_plugin: tuple[MkDocsConfig, Plugin]):

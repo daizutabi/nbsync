@@ -58,12 +58,23 @@ def test_convert_image_source_without_identifier():
     text = '![a](b.ipynb){`x=1` exec="1"}'
     image = next(parse(text))
     assert isinstance(image, Image)
-    it = convert_image(image)
+    it = convert_image(image, 0)
     code_block = next(it)
     image = next(it)
     assert isinstance(code_block, CodeBlock)
     assert isinstance(image, Image)
     assert code_block.identifier == image.identifier
+    assert code_block.identifier == "image-nbsync-0"
+
+
+def test_convert_image_source_without_identifier_error():
+    from nbsync.markdown import convert_image
+
+    text = '![a](b.ipynb){`x=1` exec="1"}'
+    image = next(parse(text))
+    assert isinstance(image, Image)
+    with pytest.raises(ValueError, match="index is required"):
+        list(convert_image(image))
 
 
 SOURCE_TAB_CODE_BLOCK = """\
@@ -85,7 +96,7 @@ def test_convert_tabbed_code_block_code_block():
     assert isinstance(elems[0], str)
     assert elems[0].startswith("===")
     assert "tabbed-nbsync" not in elems[0]
-    assert elems[1] == '=== "HTML"\n\n'
+    assert elems[1] == '=== "Rendered"\n\n'
     assert isinstance(elems[2], CodeBlock)
     assert elems[2].classes == ["python"]
     assert elems[2].source.startswith("print(")
@@ -106,7 +117,7 @@ def test_convert_tabbed_code_block_image():
     code_block = list(elems)[0]
     assert isinstance(code_block, CodeBlock)
     elems = list(convert_code_block(code_block))
-    assert elems[1] == '=== "HTML"\n\n'
+    assert elems[1] == '=== "Rendered"\n\n'
     assert isinstance(elems[2], Image)
     assert elems[2].indent == "    "
     assert elems[2].text.startswith("    ![")

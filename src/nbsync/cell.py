@@ -31,25 +31,34 @@ class Cell:
         kind = self.image.attributes.pop("source", "")
         tabs = self.image.attributes.pop("tabs", "")
 
-        source = get_source(self)
-
-        if "/" not in self.mime or not self.content:
+        if "/" not in self.mime or not self.content or kind == "source-only":
+            if self.image.source:
+                source = get_source(self, include_attrs=True)
+                kind = "only"
+            else:
+                source = ""
             result, self.image.url = "", ""
 
         elif self.mime.startswith("text/") and isinstance(self.content, str):
+            source = get_source(self, include_attrs=True)
             result, self.image.url = self.content, ""
+            result = result.rstrip()
 
         else:
+            source = get_source(self, include_attrs=False)
             result = get_result(self)
 
         if markdown := get_markdown(kind, source, result, tabs):
             return textwrap.indent(markdown, self.image.indent)
 
-        return ""
+        return ""  # no cov
 
 
-def get_source(cell: Cell) -> str:
-    attr = " ".join([cell.language, *cell.image.iter_parts()])
+def get_source(cell: Cell, *, include_attrs: bool = False) -> str:
+    attrs = [cell.language]
+    if include_attrs:
+        attrs.extend(cell.image.iter_parts())
+    attr = " ".join(attrs)
     return f"```{attr}\n{cell.image.source}\n```"
 
 
@@ -70,6 +79,9 @@ def get_markdown(kind: str, source: str, result: str, tabs: str) -> str:
 
     if not kind or not source:
         return result
+
+    if kind == "only":
+        return source
 
     if is_truelike(kind) or kind == "above":
         return f"{source}\n\n{result}"

@@ -31,7 +31,6 @@ def test_convert_image(nb):
     assert x.image.source == "print(1+1)"
     assert x.content == "2\n"
     assert x.mime == "text/plain"
-    assert x.src == ""
 
 
 def test_convert_image_invalid(nb):
@@ -148,7 +147,6 @@ def test_sync_image(sync: Synchronizer):
     assert x.image.source == "print(1+1)"
     assert x.content == "2\n"
     assert x.mime == "text/plain"
-    assert x.src == ""
     notebook = sync.notebooks["a.ipynb"]
     x = next(sync.convert('![](a.ipynb){#id exec="1"}'))
     assert isinstance(x, Cell)

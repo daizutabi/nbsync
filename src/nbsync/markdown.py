@@ -12,8 +12,12 @@ if TYPE_CHECKING:
 Element: TypeAlias = str | CodeBlock | Image
 
 
-def convert_image(image: Image, index: int) -> Iterator[Element]:
+def convert_image(image: Image, index: int | None = None) -> Iterator[Element]:
     if image.source:
+        if not image.identifier and index is None:
+            msg = "index is required when source is present and identifier is not set"
+            raise ValueError(msg)
+
         image.identifier = image.identifier or f"image-nbsync-{index}"
         yield CodeBlock("", image.identifier, [], {}, image.source, image.url)
         yield image
@@ -36,7 +40,7 @@ def convert_code_block(code_block: CodeBlock) -> Iterator[Element]:
 def _convert_code_block_tabbed(code_block: CodeBlock) -> Iterator[Element]:
     markdown = code_block.text.replace('source="tabbed-nbsync"', "")
     markdown = textwrap.indent(markdown, "    ")
-    yield f'=== "Markdown"\n\n{markdown}\n\n'
+    yield f'===! "Markdown"\n\n{markdown}\n\n'
 
     text = textwrap.indent(code_block.source, "    ")
     text = f'=== "Rendered"\n\n{text}'
