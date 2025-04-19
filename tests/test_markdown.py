@@ -109,31 +109,31 @@ def test_set_url_empty_url(url: str):
 
 
 def test_parse_url():
-    from nbsync.markdown import parse_url
+    from nbsync.markdown import resolve_urls
 
     images = [
         Image("abc", "a", [], {}, "", "a.py"),
         Image("abc", "a", [], {}, "", ""),
         Image("abc", "a", [], {}, "", "."),
     ]
-    images = list(parse_url(images))
+    images = list(resolve_urls(images))
     for image in images:
         assert isinstance(image, Image)
         assert image.url == "a.py"
 
 
 def test_parse_url_code_block():
-    from nbsync.markdown import parse_url
+    from nbsync.markdown import resolve_urls
 
     code_blocks = [CodeBlock("abc", "a", [], {}, "", "")]
-    text = list(parse_url(code_blocks))[0]
+    text = list(resolve_urls(code_blocks))[0]
     assert text == "abc"
 
 
 def test_parse_url_str():
-    from nbsync.markdown import parse_url
+    from nbsync.markdown import resolve_urls
 
-    text = list(parse_url(["abc"]))[0]
+    text = list(resolve_urls(["abc"]))[0]
     assert text == "abc"
 
 

@@ -58,7 +58,7 @@ def set_url(elem: Image | CodeBlock, url: str) -> tuple[Element, str]:
     return elem.text, url
 
 
-def parse_url(elems: Iterable[Element]) -> Iterator[Element]:
+def resolve_urls(elems: Iterable[Element]) -> Iterator[Element]:
     """Parse the URL of the image or code block.
 
     If a code block has no URL, yield the text of the code block,
@@ -78,7 +78,7 @@ def parse_url(elems: Iterable[Element]) -> Iterator[Element]:
             yield elem
 
 
-def parse_code_block(elems: Iterable[Element]) -> Iterator[Element]:
+def convert_code_blocks(elems: Iterable[Element]) -> Iterator[Element]:
     for elem in elems:
         if isinstance(elem, CodeBlock):
             yield from convert_code_block(elem)
@@ -86,7 +86,7 @@ def parse_code_block(elems: Iterable[Element]) -> Iterator[Element]:
             yield elem
 
 
-def parse_image(elems: Iterable[Element]) -> Iterator[Element]:
+def convert_images(elems: Iterable[Element]) -> Iterator[Element]:
     for elem in elems:
         if isinstance(elem, Image):
             yield from convert_image(elem)
@@ -96,6 +96,6 @@ def parse_image(elems: Iterable[Element]) -> Iterator[Element]:
 
 def parse(text: str) -> Iterator[Element]:
     elems = nbstore.markdown.parse(text)
-    elems = parse_code_block(elems)
-    elems = parse_url(elems)
-    yield from parse_image(elems)
+    elems = convert_code_blocks(elems)
+    elems = resolve_urls(elems)
+    yield from convert_images(elems)
