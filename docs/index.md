@@ -1,16 +1,6 @@
 # nbsync
 
-```markdown source="tabbed-nbsync"
-![alt](class.ipynb){#image source="material-block"}
-```
-
-```python .md#text
-4+3
-```
-
-![alt](.md){#text source="tabbed-right"}
-
-<!-- <div class="grid cards" markdown>
+<div class="grid cards" markdown>
 
 - :material-notebook-edit: **Notebooks from Markdown**
   Extend standard markdown syntax to automatically generate notebooks from
@@ -89,8 +79,6 @@ layouts.
 | ![](){`plot(np.sin)`} | ![](){`plot(np.cos)`} |
 ```
 
-![](){`plot(np.sin)`}
-
 ### Dynamic Updates and Execution
 
 Automatic synchronization between notebooks and documentation ensures code
@@ -110,4 +98,4 @@ Explore the possibilities of nbsync through practical examples:
 
 - [Basic Usage](examples/basic.md)
 - [Visualizations in Tables](examples/tables.md)
-- [Advanced Examples](examples/advanced.md) -->
+- [Advanced Examples](examples/advanced.md)

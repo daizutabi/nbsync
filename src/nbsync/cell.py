@@ -55,7 +55,7 @@ def get_source(cell: Cell) -> str:
 
 def get_result(cell: Cell) -> str:
     msg = f"{cell.image.url}#{cell.image.identifier} [{cell.mime}]"
-    logger.info(f"Converting image: {msg}")
+    logger.debug(f"Converting image: {msg}")
 
     ext = cell.mime.split("/")[1].split("+")[0]
     cell.image.url = f"{uuid.uuid4()}.{ext}"
@@ -82,10 +82,12 @@ def get_markdown(kind: str, source: str, result: str, tabs: str) -> str:
         return f"{source}\n\n{result}"
 
     if kind == "tabbed-left":
-        return get_tabbed(source, result, tabs or "Source|Result")
+        tabs = tabs if "|" in tabs else "Source|Result"
+        return get_tabbed(source, result, tabs)
 
     if kind == "tabbed-right":
-        return get_tabbed(result, source, tabs or "Result|Source")
+        tabs = tabs if "|" in tabs else "Result|Source"
+        return get_tabbed(result, source, tabs)
 
     return result
 
