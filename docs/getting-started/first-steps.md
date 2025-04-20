@@ -159,7 +159,7 @@ plt.title('Scatter Plot by Group')
 
 ![Scatter plot](){#scatter}
 
-## 6. Run Your Documentation
+### 7. Run Your Documentation
 
 Start the MkDocs development server:
 

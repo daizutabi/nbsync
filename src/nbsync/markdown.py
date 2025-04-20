@@ -12,6 +12,49 @@ if TYPE_CHECKING:
 Element: TypeAlias = str | CodeBlock | Image
 
 
+def convert_code_block(code_block: CodeBlock) -> Iterator[Element]:
+    for elem in _convert_code_block_tabbed(code_block):
+        if isinstance(elem, CodeBlock):
+            yield _convert_code_block_exec(elem)
+        else:
+            yield elem
+
+
+def _convert_code_block_tabbed(code_block: CodeBlock) -> Iterator[Element]:
+    source = code_block.attributes.get("source", None)
+    if source != "tabbed-nbsync":
+        yield code_block
+        return
+
+    markdown = code_block.text.replace('source="tabbed-nbsync"', "")
+    markdown = textwrap.indent(markdown, "    ")
+    yield f'===! "Markdown"\n\n{markdown}\n\n'
+
+    text = textwrap.indent(code_block.source, "    ")
+    text = f'=== "Rendered"\n\n{text}'
+    yield from nbstore.markdown.parse(text)
+
+
+def _convert_code_block_exec(code_block: CodeBlock) -> CodeBlock | Image:
+    exec_ = code_block.attributes.get("exec", None)
+    if exec_ != "1" or not code_block.classes:
+        return code_block
+
+    if code_block.classes[0] != "python":
+        return code_block
+
+    del code_block.attributes["exec"]
+    return Image(
+        code_block.indent,
+        "",
+        code_block.classes[1:],
+        code_block.attributes,
+        code_block.source,
+        url=".md",
+        indent=code_block.indent,
+    )
+
+
 def convert_image(image: Image, index: int | None = None) -> Iterator[Element]:
     if image.source:
         if not image.identifier and index is None:
@@ -27,24 +70,6 @@ def convert_image(image: Image, index: int | None = None) -> Iterator[Element]:
 
     else:
         yield image.text
-
-
-def convert_code_block(code_block: CodeBlock) -> Iterator[Element]:
-    source = code_block.attributes.get("source", None)
-    if source == "tabbed-nbsync":
-        yield from _convert_code_block_tabbed(code_block)
-    else:
-        yield code_block
-
-
-def _convert_code_block_tabbed(code_block: CodeBlock) -> Iterator[Element]:
-    markdown = code_block.text.replace('source="tabbed-nbsync"', "")
-    markdown = textwrap.indent(markdown, "    ")
-    yield f'===! "Markdown"\n\n{markdown}\n\n'
-
-    text = textwrap.indent(code_block.source, "    ")
-    text = f'=== "Rendered"\n\n{text}'
-    yield from nbstore.markdown.parse(text)
 
 
 SUPPORTED_EXTENSIONS = (".ipynb", ".md", ".py")

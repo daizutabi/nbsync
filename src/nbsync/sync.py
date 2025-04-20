@@ -62,8 +62,8 @@ class Synchronizer:
                 if isinstance(elem, Image):
                     nb = self.notebooks[elem.url].nb
                     yield convert_image(elem, nb)
-                else:
-                    yield convert_code_block(elem)
+                elif code_block := convert_code_block(elem):
+                    yield code_block
 
 
 def update_notebooks(
