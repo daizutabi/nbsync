@@ -104,15 +104,22 @@ layouts.
 | ![](){`plot(np.sin)`} | ![](){`plot(np.cos)`} |
 ```
 
-### Code Block with `exec` Attribute
+### Code Execution with markdown-exec Style Syntax
 
-The markdown-exec style code block with `exec` attribute.
+nbsync supports the markdown-exec style code blocks with the `exec="1"`
+attribute as a compatible approach to code execution. While this syntax
+is familiar to markdown-exec users, nbsync executes it through the
+Jupyter Notebook engine instead, providing the ability to render diverse
+MIME content types (HTML, SVG, images, etc.) directly in your
+documentation. This enables richer and more complex outputs than
+traditional execution methods.
 
 ````markdown source="tabbed-nbsync"
 ```python exec="1" source="tabbed-left"
-import matplotlib.pyplot as plt
-fig, ax = plt.subplots(figsize=(2, 1))
-ax.plot([1, 2, 3])
+import numpy as np
+from PIL import Image
+x = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
+Image.fromarray(x)
 ```
 ````
 
