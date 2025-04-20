@@ -89,14 +89,6 @@ Use standard Markdown image syntax with the figure identifier:
 ![Chart description](my-notebook.ipynb){#my-figure}
 ```
 
-## Advanced Usage
-
-For more detailed information on how to use nbsync, see:
-
-- [Notebook Configuration](usage/notebook.md) - Setting up notebook directories
-- [Class Options](usage/class.md) - Control how notebook content is displayed
-<!-- - [Workflow Tips](usage/workflow.md) - Best practices for documentation -->
-
 ## The Power of Separation
 
 Creating documentation and developing visualizations involve different
