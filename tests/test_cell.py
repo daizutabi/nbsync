@@ -54,19 +54,19 @@ def test_empty(convert):
 def test_image(convert):
     x = convert("![a](a.ipynb){#fig a b=c}")
     assert x.startswith("![a]")
-    assert x.endswith(".png){#fig a b=c}")
+    assert x.endswith('.png){#fig a b="c"}')
 
 
 def test_func(convert):
     x = convert("![a](a.ipynb){#func a=b c identifier='1'}")
-    assert x == "```python c a=b\n# #func\ndef f():\n    pass\n```"
+    assert x == '```python c a="b"\n# #func\ndef f():\n    pass\n```'
 
 
 @pytest.mark.parametrize("kind", ["above", "on", "1"])
 def test_above(convert, kind):
-    x = convert(f"![a](a.ipynb){{#fig source='{kind}' a b=c}}")
+    x = convert(f"![a](a.ipynb){{#fig source='{kind}' a b='c'}}")
     assert x.startswith("```python\n")
-    assert x.endswith(".png){#fig a b=c}")
+    assert x.endswith('.png){#fig a b="c"}')
 
 
 def test_below(convert):
