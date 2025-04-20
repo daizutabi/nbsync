@@ -104,6 +104,18 @@ layouts.
 | ![](){`plot(np.sin)`} | ![](){`plot(np.cos)`} |
 ```
 
+### Code Block with `exec` Attribute
+
+The markdown-exec style code block with `exec` attribute.
+
+````markdown source="tabbed-nbsync"
+```python exec="1" source="tabbed-left"
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(figsize=(2, 1))
+ax.plot([1, 2, 3])
+```
+````
+
 ### Dynamic Updates and Execution
 
 Automatic synchronization between notebooks and documentation ensures code

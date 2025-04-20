@@ -101,3 +101,8 @@ def test_tabbed_right_title(convert):
 def test_unknown(convert):
     x = convert("![a](a.ipynb){#id source='unknown' tabs='a|b'}")
     assert x == "2"
+
+
+def test_code_block_exec(convert):
+    x = convert('```python exec="1" source="1"\nprint(1+1)\n```')
+    assert x == "```python\nprint(1+1)\n```\n\n2"

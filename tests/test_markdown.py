@@ -123,6 +123,41 @@ def test_convert_tabbed_code_block_image():
     assert elems[2].text.startswith("    ![")
 
 
+def test_convert_code_block_exec_1():
+    from nbsync.markdown import convert_code_block
+
+    text = '```python exec="1" a\nprint(1+1)\n```'
+    elems = nbstore.markdown.parse(text)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    x = next(convert_code_block(code_block))
+    assert isinstance(x, Image)
+    assert x.classes == ["a"]
+    assert x.url == ".md"
+
+
+def test_convert_code_block_exec_on():
+    from nbsync.markdown import convert_code_block
+
+    text = '```python exec="on" a\nprint(1+1)\n```'
+    elems = nbstore.markdown.parse(text)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    x = next(convert_code_block(code_block))
+    assert isinstance(x, CodeBlock)
+
+
+def test_convert_code_block_exec_not_python():
+    from nbsync.markdown import convert_code_block
+
+    text = '```bash exec="1" a\nls\n```'
+    elems = nbstore.markdown.parse(text)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    x = next(convert_code_block(code_block))
+    assert isinstance(x, CodeBlock)
+
+
 def test_set_url():
     from nbsync.markdown import set_url
 
