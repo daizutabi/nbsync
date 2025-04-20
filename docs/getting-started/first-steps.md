@@ -167,14 +167,6 @@ Start the MkDocs development server:
 mkdocs serve --open
 ```
 
-## Next Steps
-
-Now that you have the basics working, you can:
-
-1. [Explore advanced notebook features](../usage/notebook.md)
-2. [Learn about Python file integration](../usage/python-files.md)
-3. [Discover markdown-based notebooks](../usage/markdown-files.md)
-
 ## Troubleshooting
 
 ### Common Issues
