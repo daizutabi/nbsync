@@ -117,11 +117,3 @@ Follow these steps to get started with nbsync:
 1. [Installation](getting-started/installation.md)
 2. [Configuration](getting-started/configuration.md)
 3. [First Steps](getting-started/first-steps.md)
-
-## Examples
-
-Explore the possibilities of nbsync through practical examples:
-
-- [Basic Usage](examples/basic.md)
-- [Visualizations in Tables](examples/tables.md)
-- [Advanced Examples](examples/advanced.md)
