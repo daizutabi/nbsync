@@ -118,7 +118,7 @@ traditional execution methods.
 ```python exec="1" source="tabbed-left"
 import numpy as np
 from PIL import Image
-x = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
+x = np.random.randint(0, 255, (50, 200), dtype=np.uint8)
 Image.fromarray(x)
 ```
 ````
