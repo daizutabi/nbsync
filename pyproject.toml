@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nbsync"
-version = "0.1.3"
+version = "0.1.4"
 description = "MkDocs plugin treating Jupyter notebooks, Python scripts and Markdown files as first-class citizens for documentation with dynamic execution and real-time synchronization"
 readme = "README.md"
 license = { file = "LICENSE" }
