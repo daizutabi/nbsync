@@ -23,7 +23,7 @@ def test_default_logger():
 def test_configure(reset_logger):
     custom_logger = logging.getLogger("custom_logger")
 
-    result = logger.configure(custom_logger)
+    result = logger.set_logger(custom_logger)
 
     assert result is custom_logger
     assert logger._logger is custom_logger
@@ -34,7 +34,7 @@ def test_configure_no_args(reset_logger):
     custom_logger = logging.getLogger("custom_logger")
     logger._logger = custom_logger
 
-    result = logger.configure()
+    result = logger.set_logger()
 
     assert result is custom_logger
     assert logger._logger is custom_logger

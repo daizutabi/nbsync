@@ -7,7 +7,7 @@ from typing import Any
 _logger = logging.getLogger("nbsync")
 
 
-def configure(logger: Logger | LoggerAdapter | None = None) -> Logger | LoggerAdapter:
+def set_logger(logger: Logger | LoggerAdapter | None = None) -> Logger | LoggerAdapter:
     global _logger  # noqa: PLW0603
 
     if logger:
