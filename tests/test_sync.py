@@ -167,3 +167,10 @@ def test_sync_notebook_not_found():
 
     image = Image("abc", "id", [], {}, "", "a.ipynb")
     assert convert(image, {}) == ""
+
+
+def test_convert_no_id():
+    from nbsync.sync import convert
+
+    image = Image("abc", ".", [], {}, "", "a.ipynb")
+    assert convert(image, {}) == ""

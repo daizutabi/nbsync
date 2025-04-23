@@ -5,11 +5,9 @@
 [![Build Status][GHAction-image]][GHAction-link]
 [![Coverage Status][codecov-image]][codecov-link]
 
-<strong>Connect Jupyter notebooks to your MkDocs documentation</strong>
+<strong>Connect Jupyter notebooks and Markdown documents</strong>
 
-nbsync is a MkDocs plugin that seamlessly embeds Jupyter notebook
-visualizations in your documentation, solving the disconnect between
-code development and documentation.
+nbsync is a core library that seamlessly bridges Jupyter notebooks and Markdown documents, enabling dynamic content synchronization and execution.
 
 ## Why Use nbsync?
 
@@ -23,7 +21,7 @@ Data scientists, researchers, and technical writers face a common dilemma:
 
 ### Our Solution
 
-This plugin creates a live bridge between your notebooks and documentation by:
+nbsync creates a live bridge between your notebooks and markdown documents by:
 
 - **Keeping environments separate** - work in the tool best suited for each task
 - **Maintaining connections** - reference specific figures from notebooks
@@ -41,7 +39,7 @@ This plugin creates a live bridge between your notebooks and documentation by:
 
 - **Automatic Updates**:
   When you modify your notebooks, your documentation updates
-  automatically in MkDocs serve mode.
+  automatically.
 
 - **Clean Source Documents**:
   Your markdown remains readable and focused on content, without
@@ -59,14 +57,27 @@ This plugin creates a live bridge between your notebooks and documentation by:
 pip install nbsync
 ```
 
-### 2. Configuration
+### 2. Basic Usage
 
-Add to your `mkdocs.yml`:
+```python
+from nbsync.sync import Synchronizer
+from nbstore import Store
 
-```yaml
-plugins:
-  - nbsync:
-      src_dir: ../notebooks
+# Initialize with a notebook store
+store = Store("path/to/notebooks")
+sync = Synchronizer(store)
+
+# Process markdown with notebook references
+markdown_text = """
+# My Document
+
+![Chart description](my-notebook.ipynb){#my-figure}
+"""
+
+# Convert markdown with notebook references to final output
+for element in sync.convert(markdown_text):
+    # Process each element (string or Cell objects)
+    print(element)
 ```
 
 ### 3. Mark Figures in Your Notebook
@@ -95,14 +106,14 @@ Creating documentation and developing visualizations involve different
 workflows and timeframes. When building visualizations in Jupyter notebooks,
 you need rapid cycles of execution, verification, and modification.
 
-This plugin is designed specifically to address these separation of
+nbsync is designed specifically to address these separation of
 concerns, allowing you to:
 
 - **Focus on code** in notebooks without documentation distractions
 - **Focus on narrative** in markdown without code interruptions
 - **Maintain powerful connections** between both environments
 
-Each environment is optimized for its purpose, while the plugin
+Each environment is optimized for its purpose, while nbsync
 handles the integration automatically.
 
 ## Contributing

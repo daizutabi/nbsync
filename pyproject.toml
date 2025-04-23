@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "nbsync"
 version = "0.1.4"
-description = ""
+description = "A core library to synchronize Jupyter notebooks and Markdown documents, enabling seamless integration and dynamic content execution"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "daizutabi", email = "daizutabi@gmail.com" }]
@@ -43,14 +43,9 @@ dev = [
   "ipykernel>=6.29.5",
   "matplotlib>=3.10.1",
   "nbconvert>=7.16.6",
-  "pandas>=2.2",
-  "polars>=1.26",
-  "pytest-clarity>=1.0.1",
   "pytest-cov>=6.1.0",
   "pytest-randomly>=3.16.0",
-  "pytest-xdist>=3.6.1",
   "ruff>=0.11.4",
-  "seaborn>=0.13.2",
 ]
 docs = ["mkapi", "mkdocs-material"]
 
@@ -77,11 +72,4 @@ unfixable = ["F401"]
 ignore = ["ANN401", "ARG001", "ARG002", "C901", "D", "PLR0911", "S105"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/*" = ["ANN", "ARG", "D", "FBT", "PLR", "RUF", "S", "PGH003"]
-"**/{notebooks,scripts}/*" = ["ANN", "ERA001", "NPY", "T201"]
-
-[tool.pyright]
-include = ["src", "tests"]
-strictDictionaryInference = true
-strictListInference = true
-strictSetInference = true
+"**/tests/*" = ["ANN", "ARG", "D", "FBT", "PGH003", "PLR", "RUF", "S", "SLF"]
