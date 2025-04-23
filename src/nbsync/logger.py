@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
-from logging import Logger
+from logging import Logger, LoggerAdapter
 from typing import Any
 
 _logger = logging.getLogger("nbsync")
 
 
-def configure(logger: Logger | None = None) -> Logger:
+def configure(logger: Logger | LoggerAdapter | None = None) -> Logger | LoggerAdapter:
     global _logger  # noqa: PLW0603
 
     if logger:
