@@ -92,7 +92,7 @@ def convert(
     elem: Image | CodeBlock,
     notebooks: dict[str, Notebook],
 ) -> str | Cell:
-    if elem.identifier not in [".", "_"]:
+    if elem.identifier not in [".", "_"] or "source" in elem.attributes:
         if isinstance(elem, Image):
             if elem.url not in notebooks:
                 logger.warning(f"Notebook not found: {elem.url}")
