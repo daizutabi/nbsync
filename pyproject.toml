@@ -5,14 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "nbsync"
 version = "0.1.4"
-description = "MkDocs plugin treating Jupyter notebooks, Python scripts and Markdown files as first-class citizens for documentation with dynamic execution and real-time synchronization"
+description = ""
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [{ name = "daizutabi", email = "daizutabi@gmail.com" }]
 keywords = [
   "jupyter",
   "notebook",
-  "mkdocs",
   "documentation",
   "markdown",
   "python",
@@ -32,21 +31,17 @@ classifiers = [
   "Topic :: Text Processing :: Markup :: Markdown",
 ]
 requires-python = ">=3.10"
-dependencies = ["mkdocs>=1.6", "nbstore>=0.4.7"]
+dependencies = ["nbstore>=0.4.11"]
 
 [project.urls]
 Documentation = "https://daizutabi.github.io/nbsync/"
 Source = "https://github.com/daizutabi/nbsync"
 Issues = "https://github.com/daizutabi/nbsync/issues"
 
-[project.entry-points."mkdocs.plugins"]
-nbsync = "nbsync.plugin:Plugin"
-
 [dependency-groups]
 dev = [
   "ipykernel>=6.29.5",
   "matplotlib>=3.10.1",
-  "mkdocs-material>=9.6.11",
   "nbconvert>=7.16.6",
   "pandas>=2.2",
   "polars>=1.26",
@@ -57,6 +52,7 @@ dev = [
   "ruff>=0.11.4",
   "seaborn>=0.13.2",
 ]
+docs = ["mkapi", "mkdocs-material"]
 
 [tool.pytest.ini_options]
 testpaths = ["src", "tests"]

@@ -10,11 +10,10 @@ from nbstore.markdown import CodeBlock, Image
 from nbstore.notebook import get_language, get_mime_content, get_source
 
 import nbsync.markdown
+from nbsync import logger
 from nbsync.cell import Cell
 from nbsync.markdown import is_truelike
 from nbsync.notebook import Notebook
-
-from .logger import logger
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

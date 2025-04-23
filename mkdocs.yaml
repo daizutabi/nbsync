@@ -41,10 +41,8 @@ theme:
     - search.suggest
 plugins:
   - search
-  - nbsync:
-      src_dir:
-        - ../notebooks
-        - ../scripts
+  - mkapi:
+      debug: true
 markdown_extensions:
   - admonition
   - pymdownx.emoji:
@@ -60,7 +58,4 @@ markdown_extensions:
       alternate_style: true
 nav:
   - Home: index.md
-  - Getting Started:
-      - getting-started/installation.md
-      - getting-started/configuration.md
-      - getting-started/first-steps.md
+  - API: $api/nbsync.***

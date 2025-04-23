@@ -5,9 +5,8 @@ import uuid
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from nbsync import logger
 from nbsync.markdown import is_truelike
-
-from .logger import logger
 
 if TYPE_CHECKING:
     from nbstore.markdown import Image

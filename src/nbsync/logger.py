@@ -1,5 +1,32 @@
 from __future__ import annotations
 
-from mkdocs.plugins import get_plugin_logger
+import logging
+from logging import Logger
+from typing import Any
 
-logger = get_plugin_logger("nbsync")
+_logger = logging.getLogger("nbsync")
+
+
+def configure(logger: Logger | None = None) -> Logger:
+    global _logger  # noqa: PLW0603
+
+    if logger:
+        _logger = logger
+
+    return _logger
+
+
+def debug(msg: str, *args: Any, **kwargs: Any) -> None:
+    _logger.debug(msg, *args, **kwargs)
+
+
+def info(msg: str, *args: Any, **kwargs: Any) -> None:
+    _logger.info(msg, *args, **kwargs)
+
+
+def warning(msg: str, *args: Any, **kwargs: Any) -> None:
+    _logger.warning(msg, *args, **kwargs)
+
+
+def error(msg: str, *args: Any, **kwargs: Any) -> None:
+    _logger.error(msg, *args, **kwargs)
