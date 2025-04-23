@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nbsync"
-version = "0.2.3"
+version = "0.3.0"
 description = "A core library to synchronize Jupyter notebooks and Markdown documents, enabling seamless integration and dynamic content execution"
 readme = "README.md"
 license = { file = "LICENSE" }
