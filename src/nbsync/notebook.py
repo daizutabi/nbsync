@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 import nbstore.notebook
 
+from nbsync import logger
+
 if TYPE_CHECKING:
     from nbformat import NotebookNode
 
@@ -35,5 +37,9 @@ class Notebook:
         return nbstore.notebook.equals(self.nb, other.nb)
 
     def execute(self) -> None:
-        nbstore.notebook.execute(self.nb)
-        self.execution_needed = False
+        try:
+            nbstore.notebook.execute(self.nb)
+            self.execution_needed = False
+
+        except ModuleNotFoundError as e:  # no cov
+            logger.warning(e.msg)
