@@ -57,7 +57,7 @@ def test_update_notebooks(store: Store):
     from nbsync.sync import Notebook, update_notebooks
 
     notebooks: dict[str, Notebook] = {}
-    update_notebooks(notebooks, Image("abc", "id", [], {}, "", "a.ipynb"), store)
+    update_notebooks(Image("abc", "id", [], {}, "", "a.ipynb"), notebooks, store)
     assert len(notebooks) == 1
     nb = notebooks["a.ipynb"].nb
     assert nbstore.notebook.get_source(nb, "id") == "print(1+1)"
@@ -68,7 +68,7 @@ def test_update_notebooks_exec(store: Store):
 
     notebooks: dict[str, Notebook] = {}
     image = Image("abc", "id", [], {"exec": "1"}, "", "a.ipynb")
-    update_notebooks(notebooks, image, store)
+    update_notebooks(image, notebooks, store)
     assert len(notebooks) == 1
     assert notebooks["a.ipynb"].execution_needed
 
@@ -78,7 +78,7 @@ def test_update_notebooks_add_cell(store: Store):
 
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "a.ipynb")
-    update_notebooks(notebooks, code_block, store)
+    update_notebooks(code_block, notebooks, store)
     assert len(notebooks) == 1
     notebook = notebooks["a.ipynb"]
     assert notebook.execution_needed
@@ -91,7 +91,7 @@ def test_update_notebooks_self(store: Store):
 
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", ".md")
-    update_notebooks(notebooks, code_block, store)
+    update_notebooks(code_block, notebooks, store)
     assert len(notebooks) == 1
     notebook = notebooks[".md"]
     assert len(notebook.nb.cells) == 1
@@ -102,7 +102,7 @@ def test_update_notebooks_error(store: Store):
 
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "invalid.md")
-    update_notebooks(notebooks, code_block, store)
+    update_notebooks(code_block, notebooks, store)
     assert len(notebooks) == 0
 
 
@@ -160,3 +160,10 @@ def test_sync_code_block(sync: Synchronizer):
     x = next(sync.convert("```a b.md#c source=1\nc\n```"))
     assert isinstance(x, str)
     assert x == "```a  \nc\n```"
+
+
+def test_sync_notebook_not_found():
+    from nbsync.sync import convert
+
+    image = Image("abc", "id", [], {}, "", "a.ipynb")
+    assert convert(image, {}) == ""
