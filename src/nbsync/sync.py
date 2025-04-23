@@ -35,7 +35,7 @@ class Synchronizer:
             yield elem
 
             if isinstance(elem, Image | CodeBlock):
-                update_notebooks(notebooks, elem, self.store)
+                update_notebooks(elem, notebooks, self.store)
 
         for url, notebook in notebooks.items():
             if url not in self.notebooks or not self.notebooks[url].equals(notebook):
@@ -58,17 +58,13 @@ class Synchronizer:
             if isinstance(elem, str):
                 yield elem
 
-            elif elem.identifier not in [".", "_"]:
-                if isinstance(elem, Image):
-                    nb = self.notebooks[elem.url].nb
-                    yield convert_image(elem, nb)
-                elif code_block := convert_code_block(elem):
-                    yield code_block
+            elif cell := convert(elem, self.notebooks):
+                yield cell
 
 
 def update_notebooks(
-    notebooks: dict[str, Notebook],
     elem: Image | CodeBlock,
+    notebooks: dict[str, Notebook],
     store: Store,
 ) -> None:
     url = elem.url
@@ -91,6 +87,24 @@ def update_notebooks(
     if isinstance(elem, CodeBlock):
         source = textwrap.dedent(elem.source)
         notebook.add_cell(elem.identifier, source)
+
+
+def convert(
+    elem: Image | CodeBlock,
+    notebooks: dict[str, Notebook],
+) -> str | Cell:
+    if elem.identifier not in [".", "_"]:
+        if isinstance(elem, Image):
+            if elem.url not in notebooks:
+                logger.warning(f"Notebook not found: {elem.url}")
+                return ""
+
+            nb = notebooks[elem.url].nb
+            return convert_image(elem, nb)
+
+        return convert_code_block(elem)
+
+    return ""
 
 
 def convert_image(image: Image, nb: NotebookNode) -> Cell:
