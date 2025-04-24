@@ -46,8 +46,9 @@ class Synchronizer:
                 continue
 
             path = ".md" if url == ".md" else self.store.find_path(url)
-            logger.info(f"Executing notebook: {path}")
-            notebook.execute()
+            logger.info(f"Executing notebook: {path}...")
+            if elapsed := notebook.execute():
+                logger.info(f"Notebook executed in {elapsed} seconds")
 
     def convert(self, text: str) -> Iterator[str | Cell]:
         elems = list(self.parse(text))

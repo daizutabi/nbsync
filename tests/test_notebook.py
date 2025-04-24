@@ -44,6 +44,7 @@ def test_execute():
     nb = nbformat.v4.new_notebook()
     notebook = Notebook(nb)
     notebook.add_cell("id", "print(1+1)")
-    notebook.execute()
+    x = notebook.execute()
+    assert x > 0
     assert nbstore.notebook.get_stream(notebook.nb, "id") == "2\n"
     assert notebook.execution_needed is False
