@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import textwrap
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import nbformat
@@ -48,7 +49,7 @@ class Synchronizer:
             path = ".md" if url == ".md" else self.store.find_path(url)
             logger.info(f"Executing notebook: {path}...")
             if elapsed := notebook.execute():
-                logger.info(f"Notebook executed in {elapsed} seconds")
+                logger.info(f"{Path(path).name!r} executed in {elapsed} seconds")
 
     def convert(self, text: str) -> Iterator[str | Cell]:
         elems = list(self.parse(text))
