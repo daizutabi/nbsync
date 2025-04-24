@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import os
 import time
 from typing import TYPE_CHECKING
 
@@ -10,6 +11,9 @@ from nbsync import logger
 
 if TYPE_CHECKING:
     from nbformat import NotebookNode
+
+# DeprecationWarning: Jupyter is migrating its paths to use standard platformdirs
+os.environ.setdefault("JUPYTER_PLATFORM_DIRS", "1")
 
 
 class Notebook:
