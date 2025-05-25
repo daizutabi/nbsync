@@ -1,3 +1,5 @@
+import textwrap
+
 import nbformat
 import nbstore.notebook
 import pytest
@@ -116,3 +118,26 @@ def test_code_block_exec_escape_print(convert):
 def test_code_block_exec_escape_stream(convert):
     x = convert('```python exec="1" source="1"\n"<1>"\n```')
     assert x == '```python\n"<1>"\n```\n\n&#x27;&lt;1&gt;&#x27;'
+
+
+def test_code_block_exec_result(convert):
+    x = convert('```python exec="1" result="text"\nprint(1+1)\nprint("<1>")\n```')
+    assert x == "```text\n2\n<1>\n```"
+
+
+def test_code_block_html(convert):
+    src = textwrap.dedent("""\
+    from IPython.display import HTML
+    HTML("<div>a</div>")
+    """)
+    x = convert(f'```python exec="1"\n{src}```')
+    assert x == "<div>a</div>"
+
+
+def test_code_block_html_result(convert):
+    src = textwrap.dedent("""\
+    from IPython.display import HTML
+    HTML("<div>a</div>")
+    """)
+    x = convert(f'```python exec="1" result="html"\n{src}```')
+    assert x == "```html\n<div>a</div>\n```"
