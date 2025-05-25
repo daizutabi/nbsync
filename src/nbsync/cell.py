@@ -75,7 +75,8 @@ def get_source(
 ) -> str:
     attrs = [cell.language]
     if include_attrs:
-        attrs.extend(cell.image.iter_parts(exclude_attributes=["result"]))
+        parts = cell.image.iter_parts(exclude_attributes=["result"])
+        attrs.extend(parts)
     attr = " ".join(attrs)
 
     source = cell.image.source
