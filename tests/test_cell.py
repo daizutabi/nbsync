@@ -79,7 +79,7 @@ def test_below(convert):
 
 def test_material_block(convert):
     x = convert("![a](a.ipynb){#fig source='material-block' a b=c}")
-    assert '<div class="result" markdown="1">![a]' in x
+    assert '<div class="result" markdown="1">\n![a]' in x
 
 
 def test_tabbed_left(convert):
@@ -123,6 +123,25 @@ def test_code_block_exec_escape_stream(convert):
 def test_code_block_exec_result(convert):
     x = convert('```python exec="1" result="text"\nprint(1+1)\nprint("<1>")\n```')
     assert x == "```text\n2\n<1>\n```"
+
+
+def test_code_block_exec_result_source(convert):
+    t = '```python exec="1" source="material-block" result="text"\n'
+    t += 'print(1+1)\nprint("<1>")\n```'
+    x = convert(t)
+    y = textwrap.dedent("""\
+    ```python
+    print(1+1)
+    print("<1>")
+    ```
+
+    <div class="result" markdown="1">
+    ```text
+    2
+    <1>
+    ```
+    </div>""")
+    assert x == y
 
 
 def test_code_block_html(convert):

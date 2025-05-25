@@ -31,7 +31,7 @@ classifiers = [
   "Topic :: Text Processing :: Markup :: Markdown",
 ]
 requires-python = ">=3.10"
-dependencies = ["nbstore>=0.4.11"]
+dependencies = ["nbstore>=0.5.2"]
 
 [project.urls]
 Documentation = "https://daizutabi.github.io/nbsync/"

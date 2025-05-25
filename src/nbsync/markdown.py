@@ -15,7 +15,7 @@ Element: TypeAlias = str | CodeBlock | Image
 def convert_code_block(code_block: CodeBlock) -> Iterator[Element]:
     for elem in _convert_code_block_tabbed(code_block):
         if isinstance(elem, CodeBlock):
-            yield _convert_code_block_exec(elem)
+            yield _convert_code_block_attrs(elem)
         else:
             yield elem
 
@@ -35,7 +35,7 @@ def _convert_code_block_tabbed(code_block: CodeBlock) -> Iterator[Element]:
     yield from nbstore.markdown.parse(text)
 
 
-def _convert_code_block_exec(code_block: CodeBlock) -> CodeBlock | Image:
+def _convert_code_block_attrs(code_block: CodeBlock) -> CodeBlock | Image:
     exec_ = code_block.attributes.get("exec", None)
     if exec_ != "1" or not code_block.classes:
         return code_block

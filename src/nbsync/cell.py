@@ -75,7 +75,8 @@ def get_source(
 ) -> str:
     attrs = [cell.language]
     if include_attrs:
-        attrs.extend(cell.image.iter_parts())
+        parts = cell.image.iter_parts(exclude_attributes=["result"])
+        attrs.extend(parts)
     attr = " ".join(attrs)
 
     source = cell.image.source
@@ -125,7 +126,7 @@ def get_markdown(kind: str, source: str, result: str, tabs: str) -> str:
         return f"{result}\n\n{source}"
 
     if kind == "material-block":
-        result = f'<div class="result" markdown="1">{result}</div>'
+        result = f'<div class="result" markdown="1">\n{result}\n</div>'
         return f"{source}\n\n{result}"
 
     if kind == "tabbed-left":
