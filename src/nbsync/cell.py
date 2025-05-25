@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import textwrap
 import uuid
 from dataclasses import dataclass
@@ -26,7 +27,7 @@ class Cell:
     content: bytes | str
     """The content of the image."""
 
-    def convert(self) -> str:
+    def convert(self, *, escape: bool = False) -> str:
         kind = self.image.attributes.pop("source", "")
         tabs = self.image.attributes.pop("tabs", "")
         identifier = self.image.attributes.pop("identifier", "")
@@ -51,6 +52,8 @@ class Cell:
             )
             result, self.image.url = self.content, ""
             result = result.rstrip()
+            if escape and self.mime == "text/plain":
+                result = html.escape(result)
 
         else:
             source = get_source(

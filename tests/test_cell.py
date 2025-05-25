@@ -38,7 +38,7 @@ def convert(sync: Synchronizer):
     def convert(text: str) -> str:
         cell = next(sync.convert(text))
         assert isinstance(cell, Cell)
-        return cell.convert()
+        return cell.convert(escape=True)
 
     return convert
 
@@ -106,3 +106,13 @@ def test_unknown(convert):
 def test_code_block_exec(convert):
     x = convert('```python exec="1" source="1"\nprint(1+1)\n```')
     assert x == "```python\nprint(1+1)\n```\n\n2"
+
+
+def test_code_block_exec_escape_print(convert):
+    x = convert('```python exec="1" source="1"\nprint("<1>")\n```')
+    assert x == '```python\nprint("<1>")\n```\n\n&lt;1&gt;'
+
+
+def test_code_block_exec_escape_stream(convert):
+    x = convert('```python exec="1" source="1"\n"<1>"\n```')
+    assert x == '```python\n"<1>"\n```\n\n&#x27;&lt;1&gt;&#x27;'
