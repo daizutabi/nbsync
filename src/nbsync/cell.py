@@ -50,10 +50,8 @@ class Cell:
                 include_attrs=True,
                 include_identifier=bool(identifier),
             )
-            result, self.image.url = self.content, ""
-            result = result.rstrip()
-            if escape and self.mime == "text/plain":
-                result = html.escape(result)
+            self.image.url = ""
+            result = get_text_markdown(self, escape=escape)
 
         else:
             source = get_source(
@@ -61,7 +59,7 @@ class Cell:
                 include_attrs=False,
                 include_identifier=bool(identifier),
             )
-            result = get_result(self)
+            result = get_image_markdown(self)
 
         if markdown := get_markdown(kind, source, result, tabs):
             return textwrap.indent(markdown, self.image.indent)
@@ -87,7 +85,19 @@ def get_source(
     return f"```{attr}\n{source}\n```"
 
 
-def get_result(cell: Cell) -> str:
+def get_text_markdown(cell: Cell, *, escape: bool = False) -> str:
+    text = str(cell.content.rstrip())
+
+    if lang := cell.image.attributes.get("result", ""):
+        return f"```{lang}\n{text}\n```"
+
+    if escape and cell.mime == "text/plain":
+        return html.escape(text)
+
+    return text
+
+
+def get_image_markdown(cell: Cell) -> str:
     msg = f"{cell.image.url}#{cell.image.identifier} [{cell.mime}]"
     logger.debug(f"Converting image: {msg}")
 

@@ -116,3 +116,8 @@ def test_code_block_exec_escape_print(convert):
 def test_code_block_exec_escape_stream(convert):
     x = convert('```python exec="1" source="1"\n"<1>"\n```')
     assert x == '```python\n"<1>"\n```\n\n&#x27;&lt;1&gt;&#x27;'
+
+
+def test_code_block_exec_result(convert):
+    x = convert('```python exec="1" result="text"\nprint(1+1)\nprint("<1>")\n```')
+    assert x == "```text\n2\n<1>\n```"
