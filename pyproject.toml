@@ -45,7 +45,6 @@ dev = [
   "nbconvert>=7.16.6",
   "pytest-cov>=6.1.0",
   "pytest-randomly>=3.16.0",
-  "ruff>=0.11.4",
 ]
 docs = ["mkapi", "mkdocs-material"]
 
