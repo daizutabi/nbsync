@@ -89,8 +89,13 @@ def get_source(
 def get_text_markdown(cell: Cell, *, escape: bool = False) -> str:
     text = str(cell.content.rstrip())
 
-    if lang := cell.image.attributes.get("result", ""):
-        return f"```{lang}\n{text}\n```"
+    if result := cell.image.attributes.get("result", ""):
+        if not is_truelike(result):
+            lang = result
+            return f"```{lang}\n{text}\n```"
+
+        if cell.mime == "text/plain":
+            return f"```text\n{text}\n```"
 
     if escape and cell.mime == "text/plain":
         return html.escape(text)

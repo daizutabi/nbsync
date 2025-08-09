@@ -100,6 +100,22 @@ Use standard Markdown image syntax with the figure identifier:
 ![Chart description](my-notebook.ipynb){#my-figure}
 ```
 
+### Control how results render
+
+You can control how executed outputs render using attributes:
+
+- `source`: where to place the source relative to the result.
+  Supported values include `on`/`1` (above), `below`, `only`,
+  `material-block`, `tabbed-left`, `tabbed-right`. See tests for details.
+- `result`: wrap the execution result in a fenced code block using the
+  given language (similar to mkdocs-exec). For example:
+
+````markdown
+```python exec="1" result="text"
+print(2)
+```
+````
+
 ## The Power of Separation
 
 Creating documentation and developing visualizations involve different
