@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,13 +30,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-      - name: Install uv and ruff
-        run: pip install uv ruff
+      - name: Install uv
+        run: pip install uv
       - name: Install the project
         run: uv sync
       - name: Ruff check
-        run: ruff check
-      - name: Run test
+        run: uvx ruff check
+      - name: Type check (ty)
+        run: uvx ty check
+      - name: Run tests
         run: uv run pytest -v --junitxml=junit.xml
       - name: Upload Codecov Results
         if: success()
