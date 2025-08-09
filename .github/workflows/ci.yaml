@@ -17,12 +17,14 @@ jobs:
   run:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.14' }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        exclude:
+          - os: windows-latest
+            python-version: "3.14"
 
     steps:
       - uses: actions/checkout@v4
@@ -42,13 +44,13 @@ jobs:
       - name: Run tests
         run: uv run pytest -v --junitxml=junit.xml
       - name: Upload Codecov Results
-        if: ${{ success() && !(matrix.os == 'windows-latest' && matrix.python-version == '3.14') }}
+        if: success()
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: lcov.info
       - name: Upload test results to Codecov
-        if: ${{ !cancelled() && !(matrix.os == 'windows-latest' && matrix.python-version == '3.14') }}
+        if: success()
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
