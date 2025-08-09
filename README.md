@@ -110,23 +110,11 @@ You can control how executed outputs render using attributes:
 - `result`: wrap the execution result in a fenced code block using the
   given language (similar to mkdocs-exec). For example:
 
-```markdown
+````markdown
 ```python exec="1" result="text"
 print(2)
 ```
-```
-
-For image references, you can also wrap text outputs:
-
-```markdown
-![a](my-notebook.ipynb){#my-figure result="text"}
-```
-
-This will render the result as a fenced block:
-
-```text
-2
-```
+````
 
 ## The Power of Separation
 

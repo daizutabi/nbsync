@@ -53,6 +53,18 @@ def test_text_plain_result(convert):
     assert convert('![a](a.ipynb){#id result="text"}') == "```text\n2\n```"
 
 
+@pytest.mark.parametrize("result", ["1", "on", "true", "True", "YES"])
+def test_text_plain_result_bool(convert, result):
+    assert convert(f'![a](a.ipynb){{#id result="{result}"}}') == "```text\n2\n```"
+
+
+def test_code_block_result_bool(sync: Synchronizer):
+    text = '```python exec="1" result="1"\nprint(1+1)\n```'
+    cell = next(sync.convert(text))
+    assert isinstance(cell, Cell)
+    assert cell.convert() == "```text\n2\n```"
+
+
 def test_empty(convert):
     assert convert("![a](a.ipynb){#empty}") == ""
 
