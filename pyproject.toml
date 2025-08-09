@@ -40,11 +40,11 @@ Issues = "https://github.com/daizutabi/nbsync/issues"
 
 [dependency-groups]
 dev = [
-  "ipykernel>=6.29.5",
-  "matplotlib>=3.10.1",
-  "nbconvert>=7.16.6",
-  "pytest-cov>=6.1.0",
-  "pytest-randomly>=3.16.0",
+  "ipykernel>=6",
+  "matplotlib>=3",
+  "nbconvert>=7",
+  "pytest-cov>=6",
+  "pytest-randomly>=3",
 ]
 docs = ["mkapi", "mkdocs-material"]
 

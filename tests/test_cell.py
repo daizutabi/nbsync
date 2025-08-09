@@ -49,6 +49,10 @@ def test_text_plain(convert):
     assert convert("![a](a.ipynb){#id}") == "2"
 
 
+def test_text_plain_result(convert):
+    assert convert('![a](a.ipynb){#id result="text"}') == "```text\n2\n```"
+
+
 def test_empty(convert):
     assert convert("![a](a.ipynb){#empty}") == ""
 
