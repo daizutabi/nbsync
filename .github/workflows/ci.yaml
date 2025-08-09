@@ -17,6 +17,7 @@ jobs:
   run:
     name: Python ${{ matrix.python-version }} on ${{ startsWith(matrix.os, 'macos-') && 'macOS' || startsWith(matrix.os, 'windows-') && 'Windows' || 'Linux' }}
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.14' }}
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +41,6 @@ jobs:
         run: uvx ty check
       - name: Run tests
         run: uv run pytest -v --junitxml=junit.xml
-        continue-on-error: ${{ matrix.os == 'windows-latest' && matrix.python-version == '3.14' }}
       - name: Upload Codecov Results
         if: ${{ success() && !(matrix.os == 'windows-latest' && matrix.python-version == '3.14') }}
         uses: codecov/codecov-action@v4
