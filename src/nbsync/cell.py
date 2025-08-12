@@ -14,6 +14,23 @@ if TYPE_CHECKING:
 
 
 @dataclass
+class Attributes:
+    source: str
+    tabs: str
+    identifier: str
+    result: str
+
+    @classmethod
+    def pop(cls, attrs: dict[str, str]) -> Attributes:
+        return cls(
+            source=attrs.pop("source", ""),
+            tabs=attrs.pop("tabs", ""),
+            identifier=attrs.pop("identifier", ""),
+            result=attrs.pop("result", ""),
+        )
+
+
+@dataclass
 class Cell:
     image: Image
     """The image instance from the Markdown file."""
@@ -28,19 +45,16 @@ class Cell:
     """The content of the image."""
 
     def convert(self, *, escape: bool = False) -> str:
-        kind = self.image.attributes.pop("source", "")
-        tabs = self.image.attributes.pop("tabs", "")
-        identifier = self.image.attributes.pop("identifier", "")
-        result = self.image.attributes.pop("result", "")
+        attrs = Attributes.pop(self.image.attributes)
 
-        if "/" not in self.mime or not self.content or kind == "only":
+        if "/" not in self.mime or not self.content or attrs.source == "only":
             if self.image.source:
                 source = get_source(
                     self,
                     include_attrs=True,
-                    include_identifier=bool(identifier),
+                    include_identifier=bool(attrs.identifier),
                 )
-                kind = "only"
+                attrs.source = "only"
             else:
                 source = ""
             result = self.image.url = ""
@@ -49,20 +63,20 @@ class Cell:
             source = get_source(
                 self,
                 include_attrs=True,
-                include_identifier=bool(identifier),
+                include_identifier=bool(attrs.identifier),
             )
             self.image.url = ""
-            result = get_text_markdown(self, result, escape=escape)
+            result = get_text_markdown(self, attrs.result, escape=escape)
 
         else:
             source = get_source(
                 self,
                 include_attrs=False,
-                include_identifier=bool(identifier),
+                include_identifier=bool(attrs.identifier),
             )
             result = get_image_markdown(self)
 
-        if markdown := get_markdown(kind, source, result, tabs):
+        if markdown := get_markdown(attrs.source, source, result, attrs.tabs):
             return textwrap.indent(markdown, self.image.indent)
 
         return ""  # no cov
