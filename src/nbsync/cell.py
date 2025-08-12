@@ -31,8 +31,9 @@ class Cell:
         kind = self.image.attributes.pop("source", "")
         tabs = self.image.attributes.pop("tabs", "")
         identifier = self.image.attributes.pop("identifier", "")
+        result = self.image.attributes.pop("result", "")
 
-        if "/" not in self.mime or not self.content or kind == "source-only":
+        if "/" not in self.mime or not self.content or kind == "only":
             if self.image.source:
                 source = get_source(
                     self,
@@ -42,7 +43,7 @@ class Cell:
                 kind = "only"
             else:
                 source = ""
-            result, self.image.url = "", ""
+            result = self.image.url = ""
 
         elif self.mime.startswith("text/") and isinstance(self.content, str):
             source = get_source(
@@ -51,7 +52,7 @@ class Cell:
                 include_identifier=bool(identifier),
             )
             self.image.url = ""
-            result = get_text_markdown(self, escape=escape)
+            result = get_text_markdown(self, result, escape=escape)
 
         else:
             source = get_source(
@@ -75,8 +76,7 @@ def get_source(
 ) -> str:
     attrs = [cell.language]
     if include_attrs:
-        parts = cell.image.iter_parts(exclude_attributes=["result"])
-        attrs.extend(parts)
+        attrs.extend(cell.image.iter_parts())
     attr = " ".join(attrs)
 
     source = cell.image.source
@@ -86,16 +86,12 @@ def get_source(
     return f"```{attr}\n{source}\n```"
 
 
-def get_text_markdown(cell: Cell, *, escape: bool = False) -> str:
+def get_text_markdown(cell: Cell, result: str, *, escape: bool = False) -> str:
     text = str(cell.content.rstrip())
 
-    if result := cell.image.attributes.get("result", ""):
-        if not is_truelike(result):
-            lang = result
-            return f"```{lang}\n{text}\n```"
-
-        if cell.mime == "text/plain":
-            return f"```text\n{text}\n```"
+    if result:
+        result = "text" if is_truelike(result) else result
+        return f"```{result}\n{text}\n```"
 
     if escape and cell.mime == "text/plain":
         return html.escape(text)
