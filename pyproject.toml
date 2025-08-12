@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "nbsync"
-version = "0.3.8"
+version = "0.3.9"
 description = "A core library to synchronize Jupyter notebooks and Markdown documents, enabling seamless integration and dynamic content execution"
 readme = "README.md"
 license = { file = "LICENSE" }
