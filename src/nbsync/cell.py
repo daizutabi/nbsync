@@ -46,40 +46,34 @@ class Cell:
 
     def convert(self, *, escape: bool = False) -> str:
         attrs = Attributes.pop(self.image.attributes)
+        source = get_source(
+            self,
+            include_attrs=self._include_attributes(),
+            include_identifier=bool(attrs.identifier),
+        )
 
         if "/" not in self.mime or not self.content or attrs.source == "only":
-            if self.image.source:
-                source = get_source(
-                    self,
-                    include_attrs=True,
-                    include_identifier=bool(attrs.identifier),
-                )
-                attrs.source = "only"
-            else:
-                source = ""
-            result = self.image.url = ""
+            attrs.source = "only" if self.image.source else ""
+            result = ""
+            self.image.url = ""
 
         elif self.mime.startswith("text/") and isinstance(self.content, str):
-            source = get_source(
-                self,
-                include_attrs=True,
-                include_identifier=bool(attrs.identifier),
-            )
             self.image.url = ""
             result = get_text_markdown(self, attrs.result, escape=escape)
 
         else:
-            source = get_source(
-                self,
-                include_attrs=False,
-                include_identifier=bool(attrs.identifier),
-            )
             result = get_image_markdown(self)
 
         if markdown := get_markdown(attrs.source, source, result, attrs.tabs):
             return textwrap.indent(markdown, self.image.indent)
 
         return ""  # no cov
+
+    def _include_attributes(self) -> bool:
+        if "/" not in self.mime or not self.content:
+            return True
+
+        return self.mime.startswith("text/") and isinstance(self.content, str)
 
 
 def get_source(
@@ -88,12 +82,14 @@ def get_source(
     include_attrs: bool = False,
     include_identifier: bool = False,
 ) -> str:
+    if not (source := cell.image.source):
+        return ""
+
     attrs = [cell.language]
     if include_attrs:
         attrs.extend(cell.image.iter_parts())
     attr = " ".join(attrs)
 
-    source = cell.image.source
     if include_identifier:
         source = f"# #{cell.image.identifier}\n{source}"
 
