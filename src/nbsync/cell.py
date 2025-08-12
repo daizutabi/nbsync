@@ -53,9 +53,9 @@ class Cell:
         )
 
         if "/" not in self.mime or not self.content or attrs.source == "only":
-            if self.image.source:
-                attrs.source = "only"
-            result = self.image.url = ""
+            attrs.source = "only" if self.image.source else ""
+            result = ""
+            self.image.url = ""
 
         elif self.mime.startswith("text/") and isinstance(self.content, str):
             self.image.url = ""
