@@ -46,19 +46,22 @@ class Cell:
 
     def convert(self, *, escape: bool = False) -> str:
         attrs = Attributes.pop(self.image.attributes)
+
+        if include_attrs := self._include_attributes():
+            self.image.url = ""
+
         source = get_source(
             self,
-            include_attrs=self._include_attributes(),
+            console=attrs.source == "console",
+            include_attrs=include_attrs,
             include_identifier=bool(attrs.identifier),
         )
 
-        if "/" not in self.mime or not self.content or attrs.source == "only":
+        if not self.content or attrs.source in ["console", "only"]:
             attrs.source = "only" if self.image.source else ""
             result = ""
-            self.image.url = ""
 
         elif self.mime.startswith("text/") and isinstance(self.content, str):
-            self.image.url = ""
             result = get_text_markdown(self, attrs.result, escape=escape)
 
         else:
@@ -79,11 +82,16 @@ class Cell:
 def get_source(
     cell: Cell,
     *,
+    console: bool = False,
     include_attrs: bool = False,
     include_identifier: bool = False,
 ) -> str:
     if not (source := cell.image.source):
         return ""
+
+    if console:
+        output = str(cell.content.rstrip())
+        source = f"{_add_prompt(source)}\n{output}"
 
     attrs = [cell.language]
     if include_attrs:
@@ -94,6 +102,18 @@ def get_source(
         source = f"# #{cell.image.identifier}\n{source}"
 
     return f"```{attr}\n{source}\n```"
+
+
+def _add_prompt(source: str) -> str:
+    lines = []
+    for line in source.splitlines():
+        if not line:
+            lines.append("")
+        elif line.startswith(" "):
+            lines.append(f"... {line}")
+        else:
+            lines.append(f">>> {line}")
+    return "\n".join(lines)
 
 
 def get_text_markdown(cell: Cell, result: str, *, escape: bool = False) -> str:
@@ -112,6 +132,10 @@ def get_text_markdown(cell: Cell, result: str, *, escape: bool = False) -> str:
 def get_image_markdown(cell: Cell) -> str:
     msg = f"{cell.image.url}#{cell.image.identifier} [{cell.mime}]"
     logger.debug(f"Converting image: {msg}")
+
+    if "/" not in cell.mime:
+        cell.image.url = ""
+        return ""
 
     ext = cell.mime.split("/")[1].split("+")[0]
     cell.image.url = f"{uuid.uuid4()}.{ext}"

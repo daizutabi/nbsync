@@ -4,6 +4,7 @@ import nbformat
 import nbstore.notebook
 import pytest
 from nbstore import Store
+from nbstore.markdown import Image
 
 from nbsync.cell import Cell
 from nbsync.sync import Synchronizer
@@ -176,3 +177,34 @@ def test_code_block_html_result(convert):
     """)
     x = convert(f'```python exec="1" result="html"\n{src}```')
     assert x == "```html\n<div>a</div>\n```"
+
+
+def test_console(sync: Synchronizer):
+    text = '```python exec="1" source="console"\nprint(1+1)\n```'
+    cell = next(sync.convert(text))
+    assert isinstance(cell, Cell)
+    assert cell.convert() == "```python\n>>> print(1+1)\n2\n```"
+
+
+def test_console_indent(sync: Synchronizer):
+    text = '```python exec="1" source="console"\nfor i in [1,2]:\n print(i)\n```'
+    cell = next(sync.convert(text))
+    assert isinstance(cell, Cell)
+    assert cell.convert() == "```python\n>>> for i in [1,2]:\n...  print(i)\n1\n2\n```"
+
+
+def test_console_blank_line(sync: Synchronizer):
+    text = '```python exec="1" source="console"\nimport sys\n\nsys.executable\n```'
+    cell = next(sync.convert(text))
+    assert isinstance(cell, Cell)
+    x = cell.convert()
+    assert ">>> import sys\n\n>>> sys.executable\n" in x
+    assert "python" in x.splitlines()[-2]
+
+
+def test_image_markdwon_invalid_mime():
+    from nbsync.cell import get_image_markdown
+
+    image = Image("abc", "a", [], {}, "", "a.py")
+    cell = Cell(image, "", "", "")
+    assert get_image_markdown(cell) == ""
