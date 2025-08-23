@@ -105,7 +105,7 @@ def get_source(
 
 
 def _add_prompt(source: str) -> str:
-    lines = []
+    lines: list[str] = []
     for line in source.splitlines():
         if not line:
             lines.append("")

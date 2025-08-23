@@ -72,7 +72,7 @@ def update_notebooks(
 
     if url not in notebooks:
         if url == ".md":
-            notebooks[url] = Notebook(nbformat.v4.new_notebook())
+            notebooks[url] = Notebook(nbformat.v4.new_notebook())  # pyright: ignore[reportUnknownMemberType]
         else:
             try:
                 notebooks[url] = Notebook(store.read(url))
