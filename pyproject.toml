@@ -82,3 +82,10 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = ["ANN", "ARG", "D", "FBT", "PGH003", "PLR", "RUF", "S", "SLF"]
+
+[tool.basedpyright]
+include = ["src", "tests"]
+reportAny = false
+reportExplicitAny = false
+reportImportCycles = false
+reportUnusedCallResult = false
