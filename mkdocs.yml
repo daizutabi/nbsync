@@ -43,6 +43,8 @@ plugins:
   - search
   - mkapi:
       debug: true
+  - mkdocs-nbsync:
+      src_dir: .
 markdown_extensions:
   - admonition
   - pymdownx.emoji:
@@ -59,3 +61,5 @@ markdown_extensions:
 nav:
   - Home: index.md
   - API: $api/nbsync.***
+extra_css:
+  - nbsync.css
