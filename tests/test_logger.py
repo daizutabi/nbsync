@@ -5,6 +5,9 @@ import pytest
 
 from nbsync import logger
 
+# pyright: reportPrivateUsage=false
+# pyright: reportUnusedParameter=false
+
 
 @pytest.fixture
 def reset_logger():
@@ -20,7 +23,7 @@ def test_default_logger():
     assert logger._logger.name == "nbsync"
 
 
-def test_configure(reset_logger):
+def test_configure(reset_logger: None):
     custom_logger = logging.getLogger("custom_logger")
 
     result = logger.set_logger(custom_logger)
@@ -30,7 +33,7 @@ def test_configure(reset_logger):
     assert logger._logger.name == "custom_logger"
 
 
-def test_configure_no_args(reset_logger):
+def test_configure_no_args(reset_logger: None):
     custom_logger = logging.getLogger("custom_logger")
     logger._logger = custom_logger
 
@@ -40,7 +43,7 @@ def test_configure_no_args(reset_logger):
     assert logger._logger is custom_logger
 
 
-def test_logging_methods(reset_logger, caplog):
+def test_logging_methods(reset_logger: None, caplog: pytest.LogCaptureFixture):
     caplog.set_level(logging.DEBUG, logger="nbsync")
 
     debug_msg = "Debug message"

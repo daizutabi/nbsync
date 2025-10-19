@@ -3,6 +3,8 @@ import nbstore.notebook
 
 from nbsync.notebook import Notebook
 
+# pyright: reportUnknownMemberType=false
+
 
 def test_notebook():
     nb = nbformat.v4.new_notebook()
