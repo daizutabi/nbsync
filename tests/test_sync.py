@@ -1,16 +1,27 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import nbformat
 import nbstore.notebook
 import pytest
+from nbformat import NotebookNode
 from nbstore import Store
 from nbstore.markdown import CodeBlock, Image
 
 from nbsync.cell import Cell
 from nbsync.sync import Synchronizer
 
+if TYPE_CHECKING:
+    from nbsync.notebook import Notebook
+
+# pyright: reportUnknownMemberType=false
+
 
 @pytest.fixture(scope="module")
-def nb():
+def nb() -> NotebookNode:
     nb = nbformat.v4.new_notebook()
+    assert isinstance(nb, NotebookNode)
     for source in [
         "# #id\nprint(1+1)",
         "# #empty\n",
@@ -22,7 +33,7 @@ def nb():
     return nb
 
 
-def test_convert_image(nb):
+def test_convert_image(nb: NotebookNode):
     from nbsync.sync import convert_image
 
     image = Image("abc", "id", [], {}, "", "a.py")
@@ -33,7 +44,7 @@ def test_convert_image(nb):
     assert x.mime == "text/plain"
 
 
-def test_convert_image_invalid(nb):
+def test_convert_image_invalid(nb: NotebookNode):
     from nbsync.sync import convert_image
 
     image = Image("abc", "invalid", [], {}, "", "a.py")
@@ -54,7 +65,7 @@ def store(tmp_path_factory: pytest.TempPathFactory) -> Store:
 
 
 def test_update_notebooks(store: Store):
-    from nbsync.sync import Notebook, update_notebooks
+    from nbsync.sync import update_notebooks
 
     notebooks: dict[str, Notebook] = {}
     update_notebooks(Image("abc", "id", [], {}, "", "a.ipynb"), notebooks, store)
@@ -64,7 +75,7 @@ def test_update_notebooks(store: Store):
 
 
 def test_update_notebooks_exec(store: Store):
-    from nbsync.sync import Notebook, update_notebooks
+    from nbsync.sync import update_notebooks
 
     notebooks: dict[str, Notebook] = {}
     image = Image("abc", "id", [], {"exec": "1"}, "", "a.ipynb")
@@ -74,7 +85,7 @@ def test_update_notebooks_exec(store: Store):
 
 
 def test_update_notebooks_add_cell(store: Store):
-    from nbsync.sync import Notebook, update_notebooks
+    from nbsync.sync import update_notebooks
 
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "a.ipynb")
@@ -87,7 +98,7 @@ def test_update_notebooks_add_cell(store: Store):
 
 
 def test_update_notebooks_self(store: Store):
-    from nbsync.sync import Notebook, update_notebooks
+    from nbsync.sync import update_notebooks
 
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", ".md")
@@ -98,7 +109,7 @@ def test_update_notebooks_self(store: Store):
 
 
 def test_update_notebooks_error(store: Store):
-    from nbsync.sync import Notebook, update_notebooks
+    from nbsync.sync import update_notebooks
 
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "invalid.md")

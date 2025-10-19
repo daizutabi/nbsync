@@ -3,11 +3,17 @@ import textwrap
 import nbformat
 import nbstore.notebook
 import pytest
+from nbformat import NotebookNode
 from nbstore import Store
 from nbstore.markdown import Image
 
 from nbsync.cell import Cell
 from nbsync.sync import Synchronizer
+
+# pyright: reportMissingParameterType=false
+# pyright: reportUnknownMemberType=false
+# pyright: reportUnknownParameterType=false
+# pyright: reportUnknownVariableType=false
 
 
 @pytest.fixture(scope="module")
@@ -25,14 +31,14 @@ def nb():
 
 
 @pytest.fixture(scope="module")
-def store(nb, tmp_path_factory: pytest.TempPathFactory) -> Store:
+def store(nb: NotebookNode, tmp_path_factory: pytest.TempPathFactory) -> Store:
     src_dir = tmp_path_factory.mktemp("src")
     nbformat.write(nb, src_dir.joinpath("a.ipynb"))
     return Store(src_dir)
 
 
 @pytest.fixture(scope="module")
-def sync(store):
+def sync(store: Store):
     return Synchronizer(store)
 
 

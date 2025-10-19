@@ -2,6 +2,8 @@ import nbstore.markdown
 import pytest
 from nbstore.markdown import CodeBlock, Image, parse
 
+from nbsync.markdown import Element
+
 
 def test_convert_image():
     from nbsync.markdown import convert_image
@@ -230,35 +232,35 @@ b
 
 
 @pytest.fixture(scope="module")
-def elems():
+def elems() -> list[Element]:
     from nbsync.markdown import parse
 
     return list(parse(SOURCE))
 
 
-def test_len(elems):
+def test_len(elems: list[Element]):
     assert len(elems) == 11
 
 
-def test_elems_0(elems):
+def test_elems_0(elems: list[Element]):
     image = elems[0]
     assert isinstance(image, Image)
     assert image.identifier == "."
     assert image.url == "a.py"
 
 
-def test_elems_2(elems):
+def test_elems_2(elems: list[Element]):
     image = elems[2]
     assert isinstance(image, Image)
     assert image.url == "a.py"
     assert image.identifier == "id"
 
 
-def test_elems_4(elems):
+def test_elems_4(elems: list[Element]):
     assert elems[4] == "```python\na\n```"
 
 
-def test_elems_6(elems):
+def test_elems_6(elems: list[Element]):
     code_block = elems[6]
     assert isinstance(code_block, CodeBlock)
     assert code_block.url == "a.py"
@@ -266,21 +268,23 @@ def test_elems_6(elems):
     assert code_block.source == "b"
 
 
-def test_elems_8(elems):
+def test_elems_8(elems: list[Element]):
     code_block = elems[8]
     assert isinstance(code_block, CodeBlock)
     assert code_block.url == "a.py"
     assert code_block.source == "x=1"
 
 
-def test_elems_9(elems):
+def test_elems_9(elems: list[Element]):
     image = elems[9]
     assert isinstance(image, Image)
     assert image.url == "a.py"
-    assert image.identifier == elems[8].identifier
+    code_block = elems[8]
+    assert isinstance(code_block, CodeBlock)
+    assert image.identifier == code_block.identifier
 
 
-def test_elems_10(elems):
+def test_elems_10(elems: list[Element]):
     assert elems[10] == "\n"
 
 
@@ -297,7 +301,7 @@ def test_elems_10(elems):
         ("off", False),
     ],
 )
-def test_is_truelike(value, expected):
+def test_is_truelike(value: str, *, expected: bool):
     from nbsync.markdown import is_truelike
 
     assert is_truelike(value) == expected
