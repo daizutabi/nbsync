@@ -35,19 +35,25 @@ requires-python = ">=3.10"
 dependencies = ["nbstore>=0.5.2"]
 
 [project.urls]
+Changelog = "https://github.com/daizutabi/nbsync/releases"
 Documentation = "https://daizutabi.github.io/nbsync/"
-Source = "https://github.com/daizutabi/nbsync"
+Homepage = "https://daizutabi.github.io/nbsync/"
 Issues = "https://github.com/daizutabi/nbsync/issues"
+Source = "https://github.com/daizutabi/nbsync"
 
 [dependency-groups]
 dev = [
+  "basedpyright>=1.31.7",
   "ipykernel>=6",
   "matplotlib>=3",
   "nbconvert>=7",
+  "pre-commit>=4.3.0",
   "pytest-cov>=6",
   "pytest-randomly>=3",
+  "ruff>=0.14.0",
+  "ty>=0.0.1a22",
 ]
-docs = ["mkapi", "mkdocs-material"]
+docs = ["mkapi", "mkdocs-material", "mkdocs-nbsync>=0.1.5"]
 
 [tool.pytest.ini_options]
 testpaths = ["src", "tests"]
