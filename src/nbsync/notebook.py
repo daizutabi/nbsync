@@ -7,8 +7,6 @@ from typing import TYPE_CHECKING
 
 import nbstore.notebook
 
-from nbsync import logger
-
 if TYPE_CHECKING:
     from nbformat import NotebookNode
 
@@ -42,12 +40,8 @@ class Notebook:
         return nbstore.notebook.equals(self.nb, other.nb)
 
     def execute(self) -> float:
-        try:
-            start_time = time.perf_counter()
-            nbstore.notebook.execute(self.nb)
-            end_time = time.perf_counter()
-            self.execution_needed = False
-            return end_time - start_time
-        except ModuleNotFoundError as e:  # no cov
-            logger.warning(e.msg)
-            return 0
+        start_time = time.perf_counter()
+        nbstore.notebook.execute(self.nb)
+        end_time = time.perf_counter()
+        self.execution_needed = False
+        return end_time - start_time
