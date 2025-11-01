@@ -2,12 +2,17 @@ import nbstore.markdown
 import pytest
 from nbstore.markdown import CodeBlock, Image, parse
 
-from nbsync.markdown import Element
+from nbsync.markdown import (
+    Element,
+    convert_code_block,
+    convert_image,
+    create_code_block,
+    resolve_urls,
+    set_url,
+)
 
 
 def test_convert_image():
-    from nbsync.markdown import convert_image
-
     text = "![a](b.ipynb){#c}"
     image = next(parse(text))
     assert isinstance(image, Image)
@@ -19,8 +24,6 @@ def test_convert_image():
 
 
 def test_convert_image_no_identifier():
-    from nbsync.markdown import convert_image
-
     text = "![ a ]( b.ipynb ){  c ' b ' }"
     image = next(parse(text))
     assert isinstance(image, Image)
@@ -30,8 +33,6 @@ def test_convert_image_no_identifier():
 
 
 def test_convert_image_source_with_identifier():
-    from nbsync.markdown import convert_image
-
     text = '![a](b.ipynb){#c `x=1` exec="1"}'
     image = next(parse(text))
     assert isinstance(image, Image)
@@ -55,8 +56,6 @@ def test_convert_image_source_with_identifier():
 
 
 def test_convert_image_source_without_identifier():
-    from nbsync.markdown import convert_image
-
     text = '![a](b.ipynb){`x=1` exec="1"}'
     image = next(parse(text))
     assert isinstance(image, Image)
@@ -70,8 +69,6 @@ def test_convert_image_source_without_identifier():
 
 
 def test_convert_image_source_without_identifier_error():
-    from nbsync.markdown import convert_image
-
     text = '![a](b.ipynb){`x=1` exec="1"}'
     image = next(parse(text))
     assert isinstance(image, Image)
@@ -89,8 +86,6 @@ print("Hello Markdown from markdown-exec!")
 
 
 def test_convert_tabbed_code_block_code_block():
-    from nbsync.markdown import convert_code_block
-
     elems = nbstore.markdown.parse(SOURCE_TAB_CODE_BLOCK)
     code_block = list(elems)[0]
     assert isinstance(code_block, CodeBlock)
@@ -113,8 +108,6 @@ SOURCE_TAB_IMAGE = """\
 
 
 def test_convert_tabbed_code_block_image():
-    from nbsync.markdown import convert_code_block
-
     elems = nbstore.markdown.parse(SOURCE_TAB_IMAGE)
     code_block = list(elems)[0]
     assert isinstance(code_block, CodeBlock)
@@ -126,8 +119,6 @@ def test_convert_tabbed_code_block_image():
 
 
 def test_convert_code_block_exec_1():
-    from nbsync.markdown import convert_code_block
-
     text = '```python exec="1" a\nprint(1+1)\n```'
     elems = nbstore.markdown.parse(text)
     code_block = list(elems)[0]
@@ -138,9 +129,17 @@ def test_convert_code_block_exec_1():
     assert x.url == ".md"
 
 
-def test_convert_code_block_exec_on():
-    from nbsync.markdown import convert_code_block
+def test_convert_code_block_console():
+    text = '```console exec="1" a\nls\n```'
+    elems = nbstore.markdown.parse(text)
+    code_block = list(elems)[0]
+    assert isinstance(code_block, CodeBlock)
+    x = next(convert_code_block(code_block))
+    assert isinstance(x, Image)
+    assert x.classes == ["console", "a"]
 
+
+def test_convert_code_block_exec_on():
     text = '```python exec="on" a\nprint(1+1)\n```'
     elems = nbstore.markdown.parse(text)
     code_block = list(elems)[0]
@@ -150,8 +149,6 @@ def test_convert_code_block_exec_on():
 
 
 def test_convert_code_block_exec_not_python():
-    from nbsync.markdown import convert_code_block
-
     text = '```bash exec="1" a\nls\n```'
     elems = nbstore.markdown.parse(text)
     code_block = list(elems)[0]
@@ -160,9 +157,23 @@ def test_convert_code_block_exec_not_python():
     assert isinstance(x, CodeBlock)
 
 
-def test_set_url():
-    from nbsync.markdown import set_url
+def test_create_code_block():
+    image = Image("", "", ["console"], {}, "$ ls -la")
+    code_block = create_code_block(image)
+    lines = [
+        "import subprocess",
+        "print(subprocess.check_output(['ls', '-la'], text=True).rstrip())",
+    ]
+    assert code_block.source == "\n".join(lines)
 
+
+def test_create_code_block_empty():
+    image = Image("", "", ["console"], {}, "")
+    code_block = create_code_block(image)
+    assert code_block.source == ""
+
+
+def test_set_url():
     image = Image("", "a", [], {}, "", "b.ipynb")
     image, url = set_url(image, "")
     assert isinstance(image, Image)
@@ -170,8 +181,6 @@ def test_set_url():
 
 
 def test_set_url_not_supported_extension():
-    from nbsync.markdown import set_url
-
     image = Image("abc", "a", [], {}, "", "b.txt")
     text, url = set_url(image, "a.ipynb")
     assert text == "abc"
@@ -180,8 +189,6 @@ def test_set_url_not_supported_extension():
 
 @pytest.mark.parametrize("url", ["", "."])
 def test_set_url_empty_url(url: str):
-    from nbsync.markdown import set_url
-
     image = Image("abc", "a", [], {}, "", url)
     image, url = set_url(image, "a.ipynb")
     assert isinstance(image, Image)
@@ -190,8 +197,6 @@ def test_set_url_empty_url(url: str):
 
 
 def test_resolve_urls():
-    from nbsync.markdown import resolve_urls
-
     images = [
         Image("abc", "a", [], {}, "", "a.py"),
         Image("abc", "a", [], {}, "", ""),
@@ -204,16 +209,12 @@ def test_resolve_urls():
 
 
 def test_resolve_urls_code_block():
-    from nbsync.markdown import resolve_urls
-
     code_blocks = [CodeBlock("abc", "a", [], {}, "", "")]
     text = list(resolve_urls(code_blocks))[0]
     assert text == "abc"
 
 
 def test_resolve_urls_str():
-    from nbsync.markdown import resolve_urls
-
     text = list(resolve_urls(["abc"]))[0]
     assert text == "abc"
 

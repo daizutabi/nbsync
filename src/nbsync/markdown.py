@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shlex
 import textwrap
 from typing import TYPE_CHECKING, TypeAlias
 
@@ -40,14 +41,19 @@ def _convert_code_block_attrs(code_block: CodeBlock) -> CodeBlock | Image:
     if exec_ != "1" or not code_block.classes:
         return code_block
 
-    if code_block.classes[0] != "python":
+    if code_block.classes[0] == "python":
+        classes = code_block.classes[1:]
+    elif code_block.classes[0] == "console":
+        classes = code_block.classes
+    else:
         return code_block
 
     del code_block.attributes["exec"]
+
     return Image(
         code_block.indent,
         "",
-        code_block.classes[1:],
+        classes,
         code_block.attributes,
         code_block.source,
         url=".md",
@@ -62,7 +68,7 @@ def convert_image(image: Image, index: int | None = None) -> Iterator[Element]:
             raise ValueError(msg)
 
         image.identifier = image.identifier or f"image-nbsync-{index}"
-        yield CodeBlock("", image.identifier, [], {}, image.source, image.url)
+        yield create_code_block(image)
         yield image
 
     elif image.identifier:
@@ -70,6 +76,29 @@ def convert_image(image: Image, index: int | None = None) -> Iterator[Element]:
 
     else:
         yield image.text
+
+
+def create_code_block(image: Image) -> CodeBlock:
+    if "console" in image.classes:
+        source = create_subprocess_source(image.source)
+    else:
+        source = image.source
+
+    return CodeBlock("", image.identifier, [], {}, source, image.url)
+
+
+def create_subprocess_source(source: str) -> str:
+    """Create a Python source that runs the command in subprocess."""
+    args = shlex.split(source)
+    if not args:
+        return ""
+
+    if args[0] in ["$", "#", ">"]:
+        args = args[1:]
+
+    return textwrap.dedent(f"""\
+    import subprocess
+    print(subprocess.check_output({args}, text=True).rstrip())""")
 
 
 SUPPORTED_EXTENSIONS = (".ipynb", ".md", ".py")
