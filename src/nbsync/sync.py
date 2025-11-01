@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 import textwrap
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import nbformat
@@ -41,19 +40,19 @@ class Synchronizer:
             if url not in self.notebooks or not self.notebooks[url].equals(notebook):
                 self.notebooks[url] = notebook
 
-    def execute(self) -> None:
+    def execute(self, src_uri: str | None = None) -> None:
         for url, notebook in self.notebooks.items():
             if not notebook.execution_needed:
                 continue
 
-            path = ".md" if url == ".md" else self.store.find_path(url)
-            logger.info(f"Executing notebook: {path}")
-            if elapsed := notebook.execute():
-                logger.info(f"{Path(path).name!r} executed in {elapsed:.2f} seconds")
+            path = src_uri or ".md" if url == ".md" else self.store.find_path(url)
 
-    def convert(self, text: str) -> Iterator[str | Cell]:
+            if elapsed := notebook.execute():
+                logger.info(f"{path!r} executed in {elapsed:.2f} seconds")
+
+    def convert(self, text: str, src_uri: str | None = None) -> Iterator[str | Cell]:
         elems = list(self.parse(text))
-        self.execute()
+        self.execute(src_uri)
 
         for elem in elems:
             if isinstance(elem, str):
