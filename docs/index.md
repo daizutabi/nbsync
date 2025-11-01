@@ -11,5 +11,9 @@ for x in [1, 2, 3]:
 ```
 
 ```console exec="1" source="1" result="text"
+$ date
+```
+
+```console exec="1" source="1" result="text"
 $ tree .
 ```
