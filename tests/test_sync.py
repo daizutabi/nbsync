@@ -10,7 +10,13 @@ from nbstore import Store
 from nbstore.markdown import CodeBlock, Image
 
 from nbsync.cell import Cell
-from nbsync.sync import Synchronizer
+from nbsync.sync import (
+    Synchronizer,
+    convert,
+    convert_code_block,
+    convert_image,
+    update_notebooks,
+)
 
 if TYPE_CHECKING:
     from nbsync.notebook import Notebook
@@ -34,8 +40,6 @@ def nb() -> NotebookNode:
 
 
 def test_convert_image(nb: NotebookNode):
-    from nbsync.sync import convert_image
-
     image = Image("abc", "id", [], {}, "", "a.py")
     x = convert_image(image, nb)
     assert isinstance(x, Cell)
@@ -45,8 +49,6 @@ def test_convert_image(nb: NotebookNode):
 
 
 def test_convert_image_invalid(nb: NotebookNode):
-    from nbsync.sync import convert_image
-
     image = Image("abc", "invalid", [], {}, "", "a.py")
     x = convert_image(image, nb)
     assert isinstance(x, Cell)
@@ -65,8 +67,6 @@ def store(tmp_path_factory: pytest.TempPathFactory) -> Store:
 
 
 def test_update_notebooks(store: Store):
-    from nbsync.sync import update_notebooks
-
     notebooks: dict[str, Notebook] = {}
     update_notebooks(Image("abc", "id", [], {}, "", "a.ipynb"), notebooks, store)
     assert len(notebooks) == 1
@@ -75,8 +75,6 @@ def test_update_notebooks(store: Store):
 
 
 def test_update_notebooks_exec(store: Store):
-    from nbsync.sync import update_notebooks
-
     notebooks: dict[str, Notebook] = {}
     image = Image("abc", "id", [], {"exec": "1"}, "", "a.ipynb")
     update_notebooks(image, notebooks, store)
@@ -85,8 +83,6 @@ def test_update_notebooks_exec(store: Store):
 
 
 def test_update_notebooks_add_cell(store: Store):
-    from nbsync.sync import update_notebooks
-
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "a.ipynb")
     update_notebooks(code_block, notebooks, store)
@@ -98,8 +94,6 @@ def test_update_notebooks_add_cell(store: Store):
 
 
 def test_update_notebooks_self(store: Store):
-    from nbsync.sync import update_notebooks
-
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", ".md")
     update_notebooks(code_block, notebooks, store)
@@ -109,8 +103,6 @@ def test_update_notebooks_self(store: Store):
 
 
 def test_update_notebooks_error(store: Store):
-    from nbsync.sync import update_notebooks
-
     notebooks: dict[str, Notebook] = {}
     code_block = CodeBlock("abc", "id2", [], {}, "123", "invalid.md")
     update_notebooks(code_block, notebooks, store)
@@ -118,15 +110,11 @@ def test_update_notebooks_error(store: Store):
 
 
 def test_convert_code_block_none():
-    from nbsync.sync import convert_code_block
-
     code_block = CodeBlock("abc", "id2", [], {}, "123", "a.ipynb")
     assert convert_code_block(code_block) == ""
 
 
 def test_convert_code_block_brace():
-    from nbsync.sync import convert_code_block
-
     text = '  ```{.python a#id source="on"}\n  a\n  ```'
     code_block = CodeBlock(text, "id", [], {"source": "on"}, "", "")
     x = "  ```{.python  }\n  a\n  ```"
@@ -134,8 +122,6 @@ def test_convert_code_block_brace():
 
 
 def test_convert_code_block_space():
-    from nbsync.sync import convert_code_block
-
     text = '  ```.python a#id source="on" abc\n  a\n  ```'
     code_block = CodeBlock(text, "id", [], {"source": "on"}, "", "")
     x = "  ```.python   abc\n  a\n  ```"
@@ -174,14 +160,10 @@ def test_sync_code_block(sync: Synchronizer):
 
 
 def test_sync_notebook_not_found():
-    from nbsync.sync import convert
-
     image = Image("abc", "id", [], {}, "", "a.ipynb")
     assert convert(image, {}) == ""
 
 
 def test_convert_no_id():
-    from nbsync.sync import convert
-
     image = Image("abc", ".", [], {}, "", "a.ipynb")
     assert convert(image, {}) == ""
