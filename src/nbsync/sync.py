@@ -47,7 +47,17 @@ class Synchronizer:
 
             path = src_uri or ".md" if url == ".md" else self.store.find_path(url)
 
-            if elapsed := notebook.execute():
+            try:
+                elapsed = notebook.execute()
+            except Exception as e:  # noqa: BLE001
+                if src_uri and src_uri != path:
+                    msg = f"Error reading page {src_uri!r}: "
+                else:
+                    msg = ""
+                msg = f"{msg}Error executing notebook {path!r}: {e}"
+                logger.error(msg)
+                raise SystemExit(1) from None
+            else:
                 logger.info(f"{path!r} executed in {elapsed:.2f} seconds")
 
     def convert(self, text: str, src_uri: str | None = None) -> Iterator[str | Cell]:
