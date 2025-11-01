@@ -101,6 +101,10 @@ def convert(
                 return ""
 
             nb = notebooks[elem.url].nb
+
+            if "console" in elem.classes:
+                return convert_console(elem, nb)
+
             return convert_image(elem, nb)
 
         return convert_code_block(elem)
@@ -119,6 +123,24 @@ def convert_image(image: Image, nb: NotebookNode) -> Cell:
         mime_content = ("", "")
 
     return Cell(image, get_language(nb), *mime_content)
+
+
+def remove_ansi(text: str) -> str:
+    return re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", text)
+
+
+def convert_console(image: Image, nb: NotebookNode) -> str:
+    result = image.attributes.get("result", "bash")
+    if result == "1":
+        result = "bash"
+
+    source = image.attributes.get("source", None)
+    source = f"{image.source}\n" if is_truelike(source) else ""
+
+    _, content = get_mime_content(nb, image.identifier)
+    if isinstance(content, str):
+        content = remove_ansi(content)
+    return f"```{result}\n{source}{content}```"
 
 
 def convert_code_block(code_block: CodeBlock) -> str:
