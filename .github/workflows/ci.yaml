@@ -38,10 +38,8 @@ jobs:
         run: pip install uv
       - name: Install the project
         run: uv sync
-      - name: Check pre-commit hooks are up-to-date
-        run: |
-          uv run pre-commit autoupdate
-          git diff --exit-code .pre-commit-config.yaml
+      - name: Run prek hooks
+        run: uv run prek run --all-files
       - name: Run tests
         run: uv run pytest -v --junitxml=junit.xml
       - name: Upload Codecov Results

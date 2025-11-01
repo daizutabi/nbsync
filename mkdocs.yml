@@ -61,5 +61,3 @@ markdown_extensions:
 nav:
   - Home: index.md
   - API: $api/nbsync.***
-extra_css:
-  - nbsync.css
