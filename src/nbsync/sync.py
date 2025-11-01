@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import textwrap
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import nbformat
@@ -45,7 +46,10 @@ class Synchronizer:
             if not notebook.execution_needed:
                 continue
 
-            path = src_uri or ".md" if url == ".md" else self.store.find_path(url)
+            if url == ".md":
+                path = src_uri or ".md"
+            else:
+                path = str(self.store.find_path(url).relative_to(Path.cwd()))
 
             try:
                 elapsed = notebook.execute()
