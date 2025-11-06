@@ -49,7 +49,11 @@ class Synchronizer:
             if url == ".md":
                 path = src_uri or ".md"
             else:
-                path = str(self.store.find_path(url).relative_to(Path.cwd()))
+                url_path = self.store.find_path(url)
+                if url_path.is_relative_to(Path.cwd()):
+                    path = str(url_path.relative_to(Path.cwd()))
+                else:
+                    path = str(url_path)
 
             try:
                 elapsed = notebook.execute()
