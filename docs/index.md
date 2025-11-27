@@ -17,3 +17,7 @@ $ date
 ```console exec="1" source="1" result="text"
 $ tree .
 ```
+
+```console exec="1" source="1" result="text" workdir="docs"
+$ tree .
+```

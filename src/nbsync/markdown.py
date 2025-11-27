@@ -80,14 +80,15 @@ def convert_image(image: Image, index: int | None = None) -> Iterator[Element]:
 
 def create_code_block(image: Image) -> CodeBlock:
     if "console" in image.classes:
-        source = create_subprocess_source(image.source)
+        cwd = image.attributes.pop("workdir", None)
+        source = create_subprocess_source(image.source, cwd=cwd)
     else:
         source = image.source
 
     return CodeBlock("", image.identifier, [], {}, source, image.url)
 
 
-def create_subprocess_source(source: str) -> str:
+def create_subprocess_source(source: str, cwd: str | None = None) -> str:
     """Create a Python source that runs the command in subprocess."""
     args = shlex.split(source)
     if not args:
@@ -96,9 +97,11 @@ def create_subprocess_source(source: str) -> str:
     if args[0] in ["$", "#", ">"]:
         args = args[1:]
 
+    cwd = "" if cwd is None else f", cwd='{cwd}'"
+
     return textwrap.dedent(f"""\
     import subprocess
-    print(subprocess.check_output({args}, text=True).rstrip())""")
+    print(subprocess.check_output({args}, text=True{cwd}).rstrip())""")
 
 
 SUPPORTED_EXTENSIONS = (".ipynb", ".md", ".py")
