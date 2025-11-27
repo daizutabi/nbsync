@@ -7,6 +7,7 @@ from nbsync.markdown import (
     convert_code_block,
     convert_image,
     create_code_block,
+    create_subprocess_source,
     resolve_urls,
     set_url,
 )
@@ -171,6 +172,11 @@ def test_create_code_block_empty():
     image = Image("", "", ["console"], {}, "")
     code_block = create_code_block(image)
     assert code_block.source == ""
+
+
+def test_create_subprocess_source_cwd() -> None:
+    source = create_subprocess_source("ls -la", cwd="/tmp")
+    assert "(['ls', '-la'], text=True, cwd='/tmp')" in source
 
 
 def test_set_url():
