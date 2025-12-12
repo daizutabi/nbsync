@@ -5,6 +5,12 @@ import nbsync
 nbsync
 ```
 
+```python exec="1" result="1"
+from pathlib import Path
+Path.cwd()
+print(__file__)
+```
+
 ```python exec="1" source="material-block" result="1"
 for x in [1, 2, 3]:
     print(x)
@@ -14,10 +20,6 @@ for x in [1, 2, 3]:
 $ date
 ```
 
-```console exec="1" source="1" result="text"
-$ tree .
-```
-
-```console exec="1" source="1" result="text" workdir="docs"
+```console exec="1" source="1" result="text" workdir="src"
 $ tree .
 ```
